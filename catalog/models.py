@@ -1,6 +1,9 @@
 from django.db import models
 from django.urls import reverse
 import uuid
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+import logging
 # Create your models here.
 
 
@@ -44,6 +47,17 @@ class Book(BaseModel):
     # ManyToManyField used because genre can contain many books. Books can cover many genres.
     # Genre class has already been defined so we can specify the object above.
     cover = models.ImageField(null=True, blank=True, upload_to="images")
+    LANGUAGES = (
+        ('en', 'English'),
+        ('zh', 'Chinese'),
+        ('fr', 'French'),
+        ('de', 'German'),
+        ('es', 'Spanish'),
+        ('ja', 'Japanese'),
+        ('ko', 'Korean'),
+    )
+    language = models.CharField(max_length=2, choices=LANGUAGES,
+                                default='en', help_text="Enter the language of the book")
 
     def __str__(self):
         """
@@ -56,6 +70,13 @@ class Book(BaseModel):
         Returns the url to access a particular book instance.
         """
         return reverse('book-detail', args=[str(self.id)])
+
+    def display_genre(self):
+        """
+        Creates a string for the Genre. This is required to display genre in Admin.
+        """
+        return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+    display_genre.short_description = 'Genre'    
 
 
 class BookInstance(BaseModel):
@@ -96,16 +117,25 @@ class Author(BaseModel):
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
     date_of_death = models.DateField('Died', null=True, blank=True)
-    
+
     def get_absolute_url(self):
         """
         Returns the url to access a particular author instance.
         """
         return reverse('author-detail', args=[str(self.id)])
-    
 
     def __str__(self):
         """
         String for representing the Model object.
         """
         return '%s, %s' % (self.last_name, self.first_name)
+
+
+@receiver(pre_delete, sender=Book)
+def picture_delete(sender, instance, **kwargs):
+    logging.debug('Enter picture delete method. sender:')
+    logging.debug(sender)
+    # logging.warning(**kwargs)
+    logging.debug(instance)
+    logging.debug("here")
+    instance.cover.delete(False)

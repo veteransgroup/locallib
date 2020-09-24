@@ -32,7 +32,7 @@ LOGGING = {
         },
         "console": {
             "class": "logging.StreamHandler",
-            "level": "INFO",
+            "level": "DEBUG",
             "formatter": "standard",
             "stream": "ext://sys.stdout"
         },
