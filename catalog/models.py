@@ -129,6 +129,9 @@ class Author(BaseModel):
         String for representing the Model object.
         """
         return '%s, %s' % (self.last_name, self.first_name)
+    
+    class Meta:
+        ordering = ('last_name',)
 
 
 @receiver(pre_delete, sender=Book)
