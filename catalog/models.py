@@ -3,7 +3,9 @@ from django.urls import reverse
 import uuid
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
+from django.contrib.auth.models import User
 import logging
+from datetime import date
 # Create your models here.
 
 
@@ -88,7 +90,7 @@ class BookInstance(BaseModel):
     book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
-
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     LOAN_STATUS = (
         ('m', 'Maintenance'),
         ('o', 'On loan'),
@@ -101,12 +103,19 @@ class BookInstance(BaseModel):
 
     class Meta:
         ordering = ["due_back"]
+        permissions =(('can_mark_returned','Set book as returned'),)
 
     def __str__(self):
         """
         String for representing the Model object
         """
         return '%s (%s)' % (self.id, self.book.title)
+        
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
 
 
 class Author(BaseModel):
