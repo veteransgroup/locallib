@@ -102,8 +102,8 @@ class BookInstance(BaseModel):
                               blank=True, default='m', help_text='Book availability')
 
     class Meta:
-        ordering = ["due_back"]
-        permissions =(('can_mark_returned','Set book as returned'),)
+        ordering = ['due_back']
+        permissions =(('can_mark_returned','Set book as returned'),('can_renew','Renew a bookinstance'))
 
     def __str__(self):
         """

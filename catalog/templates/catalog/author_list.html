@@ -8,8 +8,8 @@
 
       {% for obj in object_list %}
       <li>
-        <a href="{{ obj.get_absolute_url }}">{{ obj.first_name }}, {{obj.last_name }}</a> ({{ obj.date_of_birth|date:"F j, Y"}} - 
-        {% if obj.date_of_death %} {{obj.date_of_death|date:"F j, Y"}} {% else %} present {% endif %} 
+        <a href="{{ obj.get_absolute_url }}">{{ obj.first_name }}, {{obj.last_name }}</a> ( {{ obj.date_of_birth|date:"F j, Y"}} - 
+        {% if obj.date_of_death %} {{obj.date_of_death|date:"F j, Y"}} {% else %} present {% endif %} )
       </li>
       {% endfor %}
 

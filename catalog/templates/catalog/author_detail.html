@@ -4,9 +4,13 @@
   <h1>Author: {{ object.first_name }}, {{object.last_name}}</h1>
   <p>{{ object.date_of_birth|date:"F j, Y"}} - {% if object.date_of_death %}
     {{ object.date_of_death | date:"F j, Y"}}
- {% else %}
+  {% else %}
     ...
- {% endif %}</p>
+  {% endif %}</p>
+  {% if user.is_staff %}
+     <p><a href="{% url 'author_update' object.id %}">Update info</a></p>
+     <p><a href="{% url 'author_delete' object.id %}">Delete</a></p>
+  {% endif %}
   <p><strong>Works in the library:</strong> {{ object.book_set.all.count }}</p>
 
   <div style="margin-left:20px;margin-top:20px">
