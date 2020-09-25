@@ -2,9 +2,9 @@
 
 {% block content %}
 
-<h1>Delete Author</h1>
+<h1>Delete {% if flag %}Book{% else %}Author{% endif %}</h1>
 
-<p>Are you sure you want to delete the author: {{ author }}?</p>
+<p>Are you sure you want to delete the {% if flag %}book{% else %}author{% endif %}: {{ object }}?</p>
 
 <form action="" method="POST">
   {% csrf_token %}

@@ -17,6 +17,11 @@
     {% if book.cover %}
         <p><strong>Cover:</strong> <img src="{{ book.cover.url }}"/></p>
     {% endif %}
+  <hr>
+  {% if perms.catalog.can_mark_returned %}
+     <p><a href="{% url 'book_update' object.id %}">Update info</a>     
+        <a href="{% url 'book_delete' object.id %}">Delete</a></p>
+  {% endif %}
   <div style="margin-left:20px;margin-top:20px">
     <h4>Copies</h4>
 
