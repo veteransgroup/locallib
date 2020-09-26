@@ -82,7 +82,7 @@ class LoanedBooksListView(PermissionRequiredMixin, generic.ListView):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 import datetime
@@ -117,6 +117,7 @@ def renew_book_librarian(request, pk):
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from catalog.forms import RegisterForm
 
 class AuthorCreate(CreateView):
     model = Author
@@ -175,3 +176,20 @@ class BookDelete(PermissionRequiredMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['flag'] = True
         return context
+
+def register(request):
+    redirect_to = request.POST.get('next', request.GET.get('next', ''))
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            if redirect_to:
+                return redirect(redirect_to)
+            else:
+                return reverse('login')
+    else:
+        form = RegisterForm()
+
+    return render(request, 'registration/register.html', context={'form': form, 'next': redirect_to})
