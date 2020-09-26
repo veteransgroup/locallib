@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from catalog.models import Author, Book, BookInstance
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+import logging
 
 # Create your views here.
 @csrf_exempt
@@ -120,7 +121,16 @@ from django.urls import reverse_lazy
 class AuthorCreate(CreateView):
     model = Author
     fields = '__all__'    
-    initial={'date_of_death':'05/01/2118',}
+    initial={'date_of_death':'05/01/2089',}
+    
+    def get_success_url(self):
+        book_pk = self.request.GET.get('book')
+        if book_pk is not None:
+            book = get_object_or_404(Book, pk = book_pk)
+            book.author = self.object
+            book.save()
+            return reverse('book-detail', kwargs={'pk': book_pk})
+        return reverse('author-detail', kwargs={'pk': self.object.pk})
 
 class AuthorUpdate(UpdateView):
     model = Author
@@ -135,8 +145,19 @@ class AuthorDelete(PermissionRequiredMixin, DeleteView):
 class BookCreate(CreateView):
     model = Book
     fields = '__all__'    
-    initial={'isbn':'000050476218',}
+    initial={'isbn':'00090476218',}
     template_name ='catalog/author_form.html'
+
+    def get_initial(self):
+        initial_data = super().get_initial()
+        initial_data['author'] = self.request.GET.get('author')
+        return initial_data
+    
+    def get_success_url(self):
+        if self.request.GET.get('author'):
+            return reverse('author-detail', kwargs={'pk': self.request.GET.get('author')})
+        return reverse('book-detail', kwargs={'pk': self.object.pk})
+
 
 class BookUpdate(UpdateView):
     model = Book

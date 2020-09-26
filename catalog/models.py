@@ -144,9 +144,8 @@ class Author(BaseModel):
 
 
 @receiver(pre_delete, sender=Book)
-def picture_delete(sender, instance, **kwargs):
+def picture_delete(instance, **kwargs):
     logging.debug('Enter picture delete method. sender:')
-    logging.debug(sender)
     # logging.warning(**kwargs)
     logging.debug(instance)
     logging.debug("here")

@@ -98,12 +98,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '4z+x^pmp@8#ti3dr(mic3q8f5-iqmqg0ozr$z9p1a8mjeog@!7'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','4z+x^pmp@8#ti3dr(mic3q8f5-iqmqg0ozr$z9p1a8mjeog@!7')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','192.168.1.','localhost']
 
 
 # Application definition
@@ -155,11 +155,11 @@ WSGI_APPLICATION = 'locallib.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'libdb',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '192.168.1.162',
-        'PORT': '5432',
+        'NAME': os.environ.get('DJANGO_DB_NAME','libdb'),
+        'USER': os.environ.get('DJANGO_DB_USER','postgres'),
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD','postgres'),
+        'HOST': os.environ.get('DJANGO_DB_HOST','192.168.1.162'),
+        'PORT': os.environ.get('DJANGO_DB_PORT','5432'),
     }
 }
 
@@ -200,6 +200,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')

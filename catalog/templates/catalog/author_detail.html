@@ -7,9 +7,10 @@
   {% else %}
     ...
   {% endif %}</p>
-  {% if user.is_staff %}
-     <p><a href="{% url 'author_update' object.id %}">Update info</a></p>
-     <p><a href="{% url 'author_delete' object.id %}">Delete</a></p>
+  {% if perms.catalog.can_mark_returned %}
+    <p><font size="-2"><a href="{% url 'book_create' %}?author={{object.id}}">Add Book</a></font></p>
+     <p><a href="{% url 'author_update' object.id %}">Update info</a> &nbsp; &nbsp;
+     &nbsp; &nbsp; <a href="{% url 'author_delete' object.id %}">Delete</a></p>
   {% endif %}
   <p><strong>Works in the library:</strong> {{ object.book_set.all.count }}</p>
 
