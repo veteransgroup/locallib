@@ -26,15 +26,10 @@ LOGGING = {
         }
     },
     "handlers": {
-        "null": {
-            "level": "INFO",
-            "class": "logging.NullHandler",
-        },
         "console": {
             "class": "logging.StreamHandler",
             "level": "DEBUG",
-            "formatter": "standard",
-            "stream": "ext://sys.stdout"
+            "formatter": "standard"
         },
         "info_file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
@@ -45,24 +40,14 @@ LOGGING = {
             "backupCount": 10,
             "encoding": "utf8"
         },
-        "error_file_handler": {
+        "request_handler": {
             "class": "logging.handlers.RotatingFileHandler",
-            "level": "ERROR",
+            "level": "INFO",
             "formatter": "standard",
-            "filename":  "logs/errors.log",
+            "filename":  "logs/django_request.log",
             "maxBytes": 1024 * 1024 * 5,
             "backupCount": 10,
             "encoding": "utf8"
-        },
-        'request_handler': {
-            'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/django_request.log',
-            'backupCount': 20,
-            'encoding': 'utf8',
-            'formatter': 'standard',
-            'when': 'midnight',
-            'interval': 1,
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -72,18 +57,13 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {
-            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
-            "handlers": ["console", "info_file_handler", "error_file_handler"]
-        },
         "django": {
-            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
-            "handlers": ["console"],
-            "propagate": False
+            "handlers": ["console", "info_file_handler"],
+            "propagate": True
         },
         'django.request': {
-            'handlers': ['request_handler'],
-            'level': 'INFO',
+            'handlers': ['request_handler', 'mail_admins'],
+            'level': 'ERROR',
             'propagate': False
         },
     },
@@ -214,3 +194,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
+
+PAGE_SIZE = 10

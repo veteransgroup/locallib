@@ -5,6 +5,7 @@ from catalog.models import Author, Book, BookInstance
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils import timezone
+from django.conf import settings
 import logging
 
 # Create your views here.
@@ -48,7 +49,7 @@ class BookListView(LoginRequiredMixin, generic.ListView):
     # ListView 里最少只需要提供 model 属性指明模型类即可    
     model = Book
     # 加 paginate_by 属性就支持分页了（模板中要相应支持）
-    paginate_by = 10
+    paginate_by = settings.PAGE_SIZE
     # 覆写 get_queryset 可自定义查询结果
     def get_queryset(self):
         if self.request.GET.get('del') is not None:
@@ -63,7 +64,7 @@ class BookDetailView(generic.DetailView):
 
 class AuthorListView(generic.ListView):
     model = Author
-    paginate_by = 10
+    paginate_by = settings.PAGE_SIZE
     def get_queryset(self):
         if self.request.GET.get('del') is not None:
             return Author.objects.filter(deleted_at__isnull=False)
@@ -85,7 +86,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
     """
     model = BookInstance
     template_name ='catalog/bookinstance_list_borrowed.html'
-    paginate_by = 10
+    paginate_by = settings.PAGE_SIZE
     
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
@@ -93,7 +94,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
 
 class LoanedBooksListView(PermissionRequiredMixin, generic.ListView):
     model = BookInstance
-    paginate_by = 10
+    paginate_by = settings.PAGE_SIZE
     permission_required = 'catalog.can_mark_returned'
     # can share template like this:
     template_name ='catalog/bookinstance_list_borrowed.html'
