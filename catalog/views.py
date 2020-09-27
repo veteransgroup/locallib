@@ -41,15 +41,28 @@ def index(request):
     )
 
 class BookListView(LoginRequiredMixin, generic.ListView):
+    # 继承 LoginRequiredMixin 则表示本视图必须登录才能访问 
+    # ListView 默认模板为 <模型名>_list.html；可用 template_name 属性指定别的模板
+    # html模板中可使用 object_list 或 <模型名>_list 模板变量引用查询结果
+    # ListView 里最少只需要提供 model 属性指明模型类即可    
     model = Book
+    # 加 paginate_by 属性就支持分页了（模板中要相应支持）
     paginate_by = 10
+    # 覆写 get_queryset 可自定义查询结果
+    def get_queryset(self):
+        return Book.objects.filter(deleted_at=None)
 
 class BookDetailView(generic.DetailView):
+    # DetailView 默认的模板为 <模型名>_detail.html
+    # html模板中可使用 object 或 <模型名> 模板变量引用查询结果
+    # DetailView 里最少只需要提供 model 属性指明模型类即可  
     model = Book
 
 class AuthorListView(generic.ListView):
     model = Author
     paginate_by = 10
+    def get_queryset(self):
+        return Author.objects.filter(deleted_at=None)
 
 class AuthorDetailView(LoginRequiredMixin,generic.DetailView):
     model = Author
@@ -120,32 +133,49 @@ from django.urls import reverse_lazy
 from catalog.forms import RegisterForm
 
 class AuthorCreate(CreateView):
-    model = Author
-    fields = '__all__'    
+    # CreateView 默认的模板为: <模型名>_form.html；可用 template_name 属性指定别的模板
+    # html模板中表单要写<form method="post" enctype="multipart/form-data">才支持文件上传 
+    # html模板中可用 form 模板变量代表模型表单 
+    # CreateView 里最少只需要提供 model 和 fields 两个属性即可，且无需自己建 Form 类 
+    model = Author    
+    fields = ('first_name','last_name','date_of_birth','date_of_death')     
+    # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性
+
+    # initial 属性可以在新建记录时设置字段的默认值
     initial={'date_of_death':'05/01/2089',}
-    
+    # 成功后默认跳转地址为模型类里定义的 get_absolute_url 方法
+    # 覆写 get_success_url 可修改成功后跳转的地址；我在此做了额外的业务逻辑（视情况update关联记录）
     def get_success_url(self):
         book_pk = self.request.GET.get('book')
         if book_pk is not None:
             book = get_object_or_404(Book, pk = book_pk)
-            book.author = self.object
+            book.author = self.object     # self.object 为当前对象
             book.save()
             return reverse('book-detail', kwargs={'pk': book_pk})
         return reverse('author-detail', kwargs={'pk': self.object.pk})
 
 class AuthorUpdate(UpdateView):
+    # UpdateView 默认的模板为: <模型名>_form.html；可用 template_name 属性指定别的模板
+    # CreateView 和 UpdateView 默认情况下是共用模板的
+    # UpdateView 里最少只需要提供 model 和 fields 两个属性即可
     model = Author
     fields = ['first_name','last_name','date_of_birth','date_of_death']
+    # 成功后默认跳转地址为模型类里定义的 get_absolute_url 方法
 
 class AuthorDelete(PermissionRequiredMixin, DeleteView):
+    # 继承 PermissionRequiredMixin 表示本视图必须拥有下面 permission_required 申明的权限才能操作
+    # DeleteView 默认模板为: <模型名>_confirm_delete.html
+    # CreateView 里最少只需要提供 model 和 success_url 两个属性即可
     model = Author
     success_url = reverse_lazy('authors')
+    # permission_required 申明的权限是在 model 里定义的，但是不要求一定定义在 Author （本次用的）模型下
     permission_required = 'catalog.can_mark_returned'
 
 
 class BookCreate(CreateView):
     model = Book
-    fields = '__all__'    
+    fields = ('title','author','summary','isbn','genre','cover','language')
+    # fields = '__all__'    
     initial={'isbn':'00090476218',}
     template_name ='catalog/author_form.html'
 
@@ -162,7 +192,7 @@ class BookCreate(CreateView):
 
 class BookUpdate(UpdateView):
     model = Book
-    fields = '__all__'
+    fields = ('title','author','summary','isbn','genre','cover','language')
     template_name ='catalog/author_form.html'
     
 
@@ -172,6 +202,7 @@ class BookDelete(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalog.can_mark_returned'
     template_name ='catalog/author_confirm_delete.html'
 
+    # 因为想共用模板，所以覆写 get_context_data 传变量到模板，以便模板里区分到底是哪个view在用
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['flag'] = True

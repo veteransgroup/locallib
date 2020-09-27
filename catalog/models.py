@@ -30,6 +30,9 @@ class Genre(BaseModel):
         String for representing the Model object (in Admin site etc.)
         """
         return self.name
+    
+    class Meta:
+        ordering = ['name']
 
 
 class Book(BaseModel):
@@ -78,7 +81,10 @@ class Book(BaseModel):
         Creates a string for the Genre. This is required to display genre in Admin.
         """
         return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
-    display_genre.short_description = 'Genre'    
+    display_genre.short_description = 'Genre' 
+
+    class Meta:
+        ordering = ['title']   
 
 
 class BookInstance(BaseModel):
@@ -144,9 +150,20 @@ class Author(BaseModel):
 
 
 @receiver(pre_delete, sender=Book)
-def picture_delete(instance, **kwargs):
-    logging.debug('Enter picture delete method. sender:')
+def when_book_delete(instance, **kwargs):
     # logging.warning(**kwargs)
-    logging.debug(instance)
-    logging.debug("here")
-    instance.cover.delete(False)
+    if instance.pk and instance.cover:
+        instance.cover.delete(False)
+
+@receiver(models.signals.pre_save, sender=Book)
+def when_book_update(instance, **kwargs):
+    if instance.pk:
+        try:
+            old_cover = Book.objects.get(pk=instance.pk).cover
+        except Book.DoesNotExist:
+            return
+        else:
+            new_cover = instance.cover
+            if old_cover:
+                if new_cover is None or new_cover == '' or old_cover.url != new_cover.url:
+                    old_cover.delete(save=False)
