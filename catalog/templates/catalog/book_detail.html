@@ -3,8 +3,19 @@
 {% block content %}
   <h1>Title: {{ book.title }}</h1>
 
-  <p><strong>Author:</strong>{% if book.author %} <a href="{% url 'author-detail' book.author.pk %}">{{ book.author }}</a>{% else %}unkwown
-    {% if perms.catalog.can_mark_returned %} <font size="-2"><a href="{% url 'author_create' %}?book={{book.id}}">Add Author</a></font>{% endif %}{% endif %}</p>
+  <p><strong>Author:</strong>
+    {% if book.author %} 
+      {% if not book.author.deleted_at %}
+        <a href="{% url 'author-detail' book.author.pk %}">{{ book.author }}</a>
+      {% else %}
+        {{ book.author }}
+      {% endif %}
+    {% else %}unkwown
+      {% if perms.catalog.can_mark_returned %} 
+        <font size="-2"><a href="{% url 'author_create' %}?book={{book.id}}">Add Author</a></font>
+      {% endif %}
+    {% endif %}
+  </p>
   <p><strong>Summary:</strong> {{ book.summary }}</p>
   <p><strong>ISBN:</strong> {{ book.isbn }}</p> 
   <p><strong>Language:</strong> {{ book.language }}</p>  
@@ -21,7 +32,7 @@
   <hr>
   {% if perms.catalog.can_mark_returned %}
      <p><a href="{% url 'book_update' object.id %}">Update info</a>  &nbsp; &nbsp;   
-      &nbsp; &nbsp;  <a href="{% url 'book_delete' object.id %}">Delete</a></p>
+      &nbsp; &nbsp;  <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p>
   {% endif %}
   <div style="margin-left:20px;margin-top:20px">
     <h4>Copies</h4>

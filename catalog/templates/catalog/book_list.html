@@ -9,6 +9,11 @@
       {% for book in book_list %}
       <li>
         <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{book.author}})
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        {% if book.deleted_at %} 
+          <a href="{% url 'restore' book.id %}?obj=book"><font size="-1">Restore</font></a> 
+          &nbsp; &nbsp; &nbsp; <a href="{% url 'book_delete' book.id %}"><font size="-1">Destroy</font></a>
+        {% endif %}
       </li>
       {% endfor %}
 

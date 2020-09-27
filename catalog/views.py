@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from catalog.models import Author, Book, BookInstance
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.utils import timezone
 import logging
 
 # Create your views here.
@@ -50,6 +51,8 @@ class BookListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 10
     # 覆写 get_queryset 可自定义查询结果
     def get_queryset(self):
+        if self.request.GET.get('del') is not None:
+            return Book.objects.filter(deleted_at__isnull=False)
         return Book.objects.filter(deleted_at=None)
 
 class BookDetailView(generic.DetailView):
@@ -62,10 +65,19 @@ class AuthorListView(generic.ListView):
     model = Author
     paginate_by = 10
     def get_queryset(self):
-        return Author.objects.filter(deleted_at=None)
+        if self.request.GET.get('del') is not None:
+            return Author.objects.filter(deleted_at__isnull=False)
+        return Author.objects.filter(deleted_at__isnull=True)
 
 class AuthorDetailView(LoginRequiredMixin,generic.DetailView):
     model = Author
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['book_set'] = Book.objects.filter(deleted_at=None).filter(author=self.object)
+        return context
+
+
 
 class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
     """
@@ -144,7 +156,7 @@ class AuthorCreate(CreateView):
     # initial 属性可以在新建记录时设置字段的默认值
     initial={'date_of_death':'05/01/2089',}
     # 成功后默认跳转地址为模型类里定义的 get_absolute_url 方法
-    # 覆写 get_success_url 可修改成功后跳转的地址；我在此做了额外的业务逻辑（视情况update关联记录）
+    # 覆写 get_success_url 可修改成功后跳转的地址；我在此做了额外的业务逻辑（视情况update关联记录:如果是从 book 记录入口创建 author，那么book的 author 值改为新增的 author）
     def get_success_url(self):
         book_pk = self.request.GET.get('book')
         if book_pk is not None:
@@ -179,11 +191,13 @@ class BookCreate(CreateView):
     initial={'isbn':'00090476218',}
     template_name ='catalog/author_form.html'
 
+    # 覆写 get_initial 修改默认值，如果是从 author 记录入口创建book，那么默认填上 author
     def get_initial(self):
         initial_data = super().get_initial()
         initial_data['author'] = self.request.GET.get('author')
         return initial_data
-    
+
+    # 覆写 get_success_url 修改成功后跳转的地址，从哪里来回哪里去
     def get_success_url(self):
         if self.request.GET.get('author'):
             return reverse('author-detail', kwargs={'pk': self.request.GET.get('author')})
@@ -219,8 +233,58 @@ def register(request):
             if redirect_to:
                 return redirect(redirect_to)
             else:
-                return reverse('login')
+                return redirect(reverse('login'))
     else:
         form = RegisterForm()
 
     return render(request, 'registration/register.html', context={'form': form, 'next': redirect_to})
+
+@permission_required('catalog.can_renew')
+def common_delete(request, pk):
+    target = request.GET.get('del','')
+    if target == 'author':
+        obj = get_object_or_404(Author, pk = pk)
+        redirect_to = reverse('authors')
+        redirect_to_del = reverse('author_delete', kwargs={'pk': pk,})
+    elif target == 'book':
+        obj = get_object_or_404(Book, pk = pk)
+        # redirect_to = '/catalog/books/'    
+        # 上面是硬编码，所以注释了, 改用 reverse 函数通过名字反向解析出url路径
+        redirect_to = reverse('books')
+        redirect_to_del = reverse('book_delete', args=[pk])
+    elif target == 'bookinstance':
+        obj = get_object_or_404(BookInstance, pk = pk)
+        redirect_to = reverse('bookinstances')
+        redirect_to_del = reverse('bookinstance_delete', args=[pk])
+    else:
+        return reverse('index')
+    if obj.deleted_at is None:
+        print("Fake del")
+        obj.deleted_at = timezone.now()
+        obj.save()
+        return redirect(redirect_to)
+    else:
+        print("Real del")
+        return redirect(redirect_to_del)
+
+
+@permission_required('catalog.can_renew')
+def common_restore(request, pk):
+    target = request.GET.get('obj','')
+    if target == 'author':
+        obj = get_object_or_404(Author, pk = pk)
+        redirect_to = reverse('author-detail', args=[pk])
+    elif target == 'book':
+        obj = get_object_or_404(Book, pk = pk)
+        # redirect_to = '/catalog/books/'    
+        # 上面是硬编码，所以注释了, 改用 reverse 函数通过名字反向解析出url路径
+        redirect_to = reverse('book-detail', args=[pk])
+    elif target == 'bookinstance':
+        obj = get_object_or_404(BookInstance, pk = pk)
+        redirect_to = reverse('bookinstance-detail', args=[pk])
+    else:
+        return reverse('index')
+
+    obj.deleted_at = None
+    obj.save()
+    return redirect(redirect_to)
