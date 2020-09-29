@@ -24,7 +24,7 @@
         <p>{{ book.summary }}</p>
         <br>
         {% if book.cover %}
-        <img src="{{ book.cover.url }}"/>
+        <img src="{{ book.cover.url }}"  style="max-width: 36%; border-radius: 10%;" class="col-md-4"/>
         {% endif %}
       </li>
     {% endfor %}
