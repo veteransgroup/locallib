@@ -21,7 +21,7 @@
     <hr>
       <li>
         <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{book.bookinstance_set.all.count}}) 
-        <p>{{ book.summary }}</p>
+        <p>{{ book.summary | truncatewords:30 }}</p>
         <br>
         {% if book.cover %}
         <img src="{{ book.cover.url }}"  style="max-width: 36%; border-radius: 10%;" class="col-md-4"/>
