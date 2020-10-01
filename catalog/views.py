@@ -6,6 +6,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 import logging
 
 # Create your views here.
@@ -42,7 +43,7 @@ def index(request):
                  'num_instances_available': num_instances_available, 'num_authors': num_authors},
     )
 
-class BookListView(LoginRequiredMixin, generic.ListView):
+class BookListView(generic.ListView):
     # 继承 LoginRequiredMixin 则表示本视图必须登录才能访问 
     # ListView 默认模板为 <模型名>_list.html；可用 template_name 属性指定别的模板
     # html模板中可使用 object_list 或 <模型名>_list 模板变量引用查询结果
@@ -75,7 +76,7 @@ class AuthorListView(generic.ListView):
             return Author.objects.filter(deleted_at__isnull=False)
         return Author.objects.filter(deleted_at__isnull=True)
 
-class AuthorDetailView(LoginRequiredMixin,generic.DetailView):
+class AuthorDetailView(generic.DetailView):
     model = Author
 
     def get_context_data(self, **kwargs):
@@ -146,11 +147,28 @@ def renew_book_librarian(request, pk):
 
     return render(request, 'catalog/book_renew_librarian.html', {'form': form, 'bookinst':book_inst})
 
+@login_required
+def lend_book(request, pk):
+    book_inst=get_object_or_404(BookInstance, pk = pk)
+    if request.method == 'POST':
+        form = RenewBookForm(request.POST)
+        if form.is_valid():
+            book_inst.due_back=form.cleaned_data['renewal_date']
+            book_inst.borrower=request.user
+            book_inst.status='o'
+            book_inst.save()
+            return HttpResponseRedirect(reverse('my-borrowed'))
+    else:
+        proposed_return_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date':proposed_return_date,})
+    return render(request, 'catalog/lend_bookinstance_form.html', {'form': form, 'bookinst':book_inst}) 
+
+
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from catalog.forms import RegisterForm
 
-class AuthorCreate(CreateView):
+class AuthorCreate(LoginRequiredMixin, CreateView):
     # CreateView 默认的模板为: <模型名>_form.html；可用 template_name 属性指定别的模板
     # html模板中表单要写<form method="post" enctype="multipart/form-data">才支持文件上传 
     # html模板中可用 form 模板变量代表模型表单 
@@ -172,7 +190,7 @@ class AuthorCreate(CreateView):
             return reverse('book-detail', kwargs={'pk': book_pk})
         return reverse('author-detail', kwargs={'pk': self.object.pk})
 
-class AuthorUpdate(UpdateView):
+class AuthorUpdate(LoginRequiredMixin, UpdateView):
     # UpdateView 默认的模板为: <模型名>_form.html；可用 template_name 属性指定别的模板
     # CreateView 和 UpdateView 默认情况下是共用模板的
     # UpdateView 里最少只需要提供 model 和 fields 两个属性即可
@@ -190,7 +208,7 @@ class AuthorDelete(PermissionRequiredMixin, DeleteView):
     permission_required = 'catalog.can_mark_returned'
 
 
-class BookCreate(CreateView):
+class BookCreate(LoginRequiredMixin, CreateView):
     model = Book
     fields = ('title','author','summary','isbn','genre','cover','language')
     # fields = '__all__'    
@@ -210,7 +228,7 @@ class BookCreate(CreateView):
         return reverse('book-detail', kwargs={'pk': self.object.pk})
 
 
-class BookUpdate(UpdateView):
+class BookUpdate(LoginRequiredMixin, UpdateView):
     model = Book
     fields = ('title','author','summary','isbn','genre','cover','language')
     template_name ='catalog/author_form.html'

@@ -32,7 +32,7 @@
   <hr>
   {% if perms.catalog.can_mark_returned %}
     <p><a href="{% url 'book_update' object.id %}">Update info</a>  &nbsp; &nbsp;   
-      &nbsp; &nbsp;  <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p>   
+      &nbsp; &nbsp;  <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p><hr><br>   
     <p><a href="{% url 'bookinstance_create'%}?book={{object.id}}">Add bookinstance</a></p>
   {% endif %}
   <div style="margin-left:20px;margin-top:20px">
@@ -44,8 +44,14 @@
     {% if copy.status != 'a' %}<p><strong>Due to be returned:</strong> {{copy.due_back}}</p>{% endif %}
     <p><strong>Imprint:</strong> {{copy.imprint}}</p>
     <p class="text-muted"><strong>Id:</strong> {{copy.id}}</p>
-    <p><a href="{% url 'bookinstance_update' copy.id %}">Update info</a>&nbsp; &nbsp;   
+    {% if perms.catalog.can_mark_returned %} 
+      {% if copy.borrower %} {{ copy.borrower }}<br> {% endif %}
+      <p><a href="{% url 'bookinstance_update' copy.id %}">Update info</a>&nbsp; &nbsp;   
        &nbsp; &nbsp;  <a href="{% url 'common_delete2' copy.id %}?del=bookinstance&book={{book.id}}">Delete</a></p>
+    {% endif %}
+    {% if user.is_authenticated and copy.status == 'a' %} 
+        <p><a href="{% url 'lend-book' copy.id %}">Lend book</a></p>
+    {% endif %}
     {% endfor %}
   </div>
 {% endblock %}
