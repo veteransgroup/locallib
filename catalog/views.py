@@ -62,6 +62,11 @@ class BookDetailView(generic.DetailView):
     # DetailView 里最少只需要提供 model 属性指明模型类即可  
     model = Book
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['bookinstance_set'] = BookInstance.objects.filter(deleted_at=None).filter(book=self.object).order_by('-status')
+        return context
+
 class AuthorListView(generic.ListView):
     model = Author
     paginate_by = settings.PAGE_SIZE
@@ -255,7 +260,13 @@ def common_delete(request, pk):
         redirect_to_del = reverse('book_delete', args=[pk])
     elif target == 'bookinstance':
         obj = get_object_or_404(BookInstance, pk = pk)
-        redirect_to = reverse('bookinstances')
+        book_id = request.GET.get('book')
+        if obj.status == 'o':
+            book = get_object_or_404(Book, pk=book_id)
+            return render(request, 'catalog/book_detail.html', {'book':book,'object': book, 
+            'warn':"Can't delete this book instance due to its on loan status",
+            'bookinstance_set':BookInstance.objects.filter(deleted_at=None).filter(book=book).order_by('-status')})
+        redirect_to = reverse('book-detail', args=[book_id])
         redirect_to_del = reverse('bookinstance_delete', args=[pk])
     else:
         return reverse('index')
@@ -282,7 +293,7 @@ def common_restore(request, pk):
         redirect_to = reverse('book-detail', args=[pk])
     elif target == 'bookinstance':
         obj = get_object_or_404(BookInstance, pk = pk)
-        redirect_to = reverse('bookinstance-detail', args=[pk])
+        redirect_to = reverse('bookinstances')
     else:
         return reverse('index')
 
@@ -291,22 +302,22 @@ def common_restore(request, pk):
     return redirect(redirect_to)
 
 
-class BookInstanceListView(generic.ListView):
+class BookInstanceListView(PermissionRequiredMixin, generic.ListView):
     model = BookInstance
     paginate_by = settings.PAGE_SIZE
+    permission_required = 'catalog.can_mark_returned'
     def get_queryset(self):
         if self.request.GET.get('del') is not None:
             return BookInstance.objects.filter(deleted_at__isnull=False)
-        return BookInstance.objects.filter(deleted_at=None)
+        return BookInstance.objects.all()
 
-class BookInstanceDetailView(generic.DetailView):
-    model = BookInstance
 
-class BookInstanceCreate(CreateView):
+class BookInstanceCreate(PermissionRequiredMixin, CreateView):
     model = BookInstance
     fields = ('book','imprint','status')
     initial={'status':'a',}
     template_name ='catalog/author_form.html'
+    permission_required = 'catalog.can_mark_returned'
 
     def get_initial(self):
         initial_data = super().get_initial()
@@ -316,16 +327,29 @@ class BookInstanceCreate(CreateView):
     def get_success_url(self):
         if self.request.GET.get('book'):
             return reverse('book-detail', kwargs={'pk': self.request.GET.get('book')})
-        return reverse('bookinstance-detail', kwargs={'pk': self.object.pk})
+        return reverse('bookinstances')
 
 
-class BookInstanceUpdate(UpdateView):
+class BookInstanceUpdate(PermissionRequiredMixin, UpdateView):
     model = BookInstance
     fields = ('book','imprint','status','borrower','status')
+    template_name ='catalog/author_form.html'
+    permission_required = 'catalog.can_mark_returned'
     
+
+from django.views.generic import DeleteView
 
 class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
     model = BookInstance
     success_url = reverse_lazy('bookinstances')
     permission_required = 'catalog.can_mark_returned'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.status == 'o' and self.object.borrower is not None:
+            # return HttpResponseRedirect(reverse('bookinstances'))
+            return render(request, 'catalog/bookinstance_list.html', {'object_list':BookInstance.objects.all(), 
+            'warn':"Can't delete this book instance due to its on loan by %s"%self.object.borrower })
+        else:
+            return super().delete(request, *args, **kwargs)
 

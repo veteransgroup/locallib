@@ -2,25 +2,28 @@
 
 {% block content %}
     <h1>Book Instance List</h1>
-
+    {{ warn }}
     {% if object_list %}
     <ul>
-
-      {% for book in object_list %}
-      <li>
-        <a href="{% url 'book-detail' book.book.id %}">{{ book.book.title }}</a> ({{book.book.author}})
-        &nbsp; &nbsp; &nbsp; 
-        {{ book.imprint }}
-        &nbsp; &nbsp; {{ book.status }} <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">{{ copy.get_status_display }}</p>
-        &nbsp; &nbsp; {{ book.borrower }} 
-        &nbsp; &nbsp; {{ book.due_back }} &nbsp; &nbsp; &nbsp; 
-        {% if book.deleted_at %} 
-          <a href="{% url 'restore' book.id %}?obj=bookinstance"><font size="-1">Restore</font></a> 
-          &nbsp; &nbsp; &nbsp; <a href="{% url 'bookinstance_delete' book.id %}"><font size="-1">Destroy</font></a>
-        {% endif %}
-      </li>
+      <table>
+      {% for bookinstance in object_list %}
+        <tr>
+          <td>
+            <a href="{% url 'book-detail' bookinstance.book.id %}">{{ bookinstance.book.title }}</a></td> 
+          <td>({% if bookinstance.book.author %} {{bookinstance.book.author}} {% else %} unknown {% endif %})</td>
+          <td>{% if bookinstance.imprint %} {{ bookinstance.imprint }} {% endif %}</td>
+          <td class="{% if bookinstance.status == 'a' %}text-success{% elif bookinstance.status == 'm' %}text-danger{% else %}text-warning{% endif %}">{{ bookinstance.get_status_display }}</td>
+          <td>{% if bookinstance.borrower %} {{ bookinstance.borrower }} {% endif %} </td>
+          <td>{% if bookinstance.due_back %} {{ bookinstance.due_back }} {% endif %} </td>
+          <td>{% if bookinstance.deleted_at %} 
+               <a href="{% url 'restore2' bookinstance.id %}?obj=bookinstance"><font size="-1">Restore</font></a> 
+              {% endif %}
+          </td>
+          <td><a href="{% url 'bookinstance_delete' bookinstance.id %}"><font size="-1">Destroy</font></a></td>
+          <td><a href="{% url 'bookinstance_update' bookinstance.id %}"><font size="-1">Update</font></a></td>
+      </tr>
       {% endfor %}
-
+    </table>
     </ul>
     {% else %}
       <p>There are no books in the library.</p>

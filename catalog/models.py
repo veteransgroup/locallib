@@ -129,7 +129,7 @@ class BookInstance(BaseModel):
         """
         Returns the url to access a particular author instance.
         """
-        return reverse('bookinstance-detail', args=[str(self.id)])
+        return reverse('bookinstances')
         
     @property
     def is_overdue(self):
