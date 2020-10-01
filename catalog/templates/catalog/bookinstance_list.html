@@ -1,0 +1,31 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Book Instance List</h1>
+    {{ warn }}
+    {% if object_list %}
+    <ul>
+      <table>
+      {% for bookinstance in object_list %}
+        <tr>
+          <td>
+            <a href="{% url 'book-detail' bookinstance.book.id %}">{{ bookinstance.book.title }}</a></td> 
+          <td>({% if bookinstance.book.author %} {{bookinstance.book.author}} {% else %} unknown {% endif %})</td>
+          <td>{% if bookinstance.imprint %} {{ bookinstance.imprint }} {% endif %}</td>
+          <td class="{% if bookinstance.status == 'a' %}text-success{% elif bookinstance.status == 'm' %}text-danger{% else %}text-warning{% endif %}">{{ bookinstance.get_status_display }}</td>
+          <td>{% if bookinstance.borrower %} {{ bookinstance.borrower }} {% endif %} </td>
+          <td>{% if bookinstance.due_back %} {{ bookinstance.due_back }} {% endif %} </td>
+          <td>{% if bookinstance.deleted_at %} 
+               <a href="{% url 'restore2' bookinstance.id %}?obj=bookinstance"><font size="-1">Restore</font></a> 
+              {% endif %}
+          </td>
+          <td><a href="{% url 'bookinstance_delete' bookinstance.id %}"><font size="-1">Destroy</font></a></td>
+          <td><a href="{% url 'bookinstance_update' bookinstance.id %}"><font size="-1">Update</font></a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    </ul>
+    {% else %}
+      <p>There are no books in the library.</p>
+    {% endif %}       
+{% endblock %}

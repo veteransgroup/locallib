@@ -1,25 +1,21 @@
 {% extends "base_generic.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
 {% block content %}
-<div class="flex-center">
-    <div class="unit-1-2 unit-1-on-mobile">
-        <h3>Sign up</h3>
-        <form class="form" action="" method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                {{ field.label_tag }}
-                {{ field }}
-                {{ field.errors }}
-                {% if field.help_text %}
-                    <p class="help text-small text-muted">{{ field.help_text|safe }}</p>
-                {% endif %}
-            {% endfor %}
-            <button type="submit" class="btn btn-primary btn-block">register</button>
-                                <input type="hidden" name="next" value="{{ next }}"/>
-        </form>
-        <div class="flex-center top-gap text-small">
-            <a href="{% url 'login'%}?next={{request.path}}">Sign in</a>
-        </div>
-    </div>
-</div>
+<h1>{% trans "Sign Up" %}</h1>
+
+<p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+
+<form class="signup" id="signup_form" method="post" action="">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+</form>
 
 {% endblock %}

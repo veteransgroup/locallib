@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Author, Genre, Book, BookInstance
+from .models import Author, Genre, Book, BookInstance, LibUser
 
 admin.site.register(Genre)
 
@@ -46,3 +46,8 @@ class BookInstanceAdmin(admin.ModelAdmin):
             'fields': ('status', 'due_back', 'borrower')
         }),
     )
+
+@admin.register(LibUser)
+class LibUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'phone', 'card_No', 'date_joined')
+    readonly_fields = ('date_joined',)

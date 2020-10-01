@@ -7,7 +7,7 @@ import json
 import platform
 import datetime
 import re
-from django.contrib.auth.models import User
+from catalog.models import LibUser
 
 
 def render_json(code=0, msg='success', data={}):
@@ -399,8 +399,8 @@ class EmailBackend:
         # 要注意登录表单中用户输入的用户名或者邮箱的 field 名均为 username
         email = credentials.get('email', credentials.get('username'))
         try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
+            user = LibUser.objects.get(email=email)
+        except LibUser.DoesNotExist:
             pass
         else:
             if user.check_password(credentials["password"]):
@@ -411,6 +411,26 @@ class EmailBackend:
         该方法是必须的
         """
         try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+            return LibUser.objects.get(pk=user_id)
+        except LibUser.DoesNotExist:
+            return None
+
+class CardNoBackend:
+    def authenticate(self, request, **credentials):
+        card_no = credentials.get('card_No', credentials.get('username'))
+        try:
+            user = LibUser.objects.get(card_No=card_no)
+        except LibUser.DoesNotExist:
+            pass
+        else:
+            if user.check_password(credentials["password"]):
+                return user
+
+    def get_user(self, user_id):
+        """
+        该方法是必须的
+        """
+        try:
+            return LibUser.objects.get(pk=user_id)
+        except LibUser.DoesNotExist:
             return None

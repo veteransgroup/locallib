@@ -18,5 +18,12 @@ urlpatterns = [
     path('allborrowed/', views.LoanedBooksListView.as_view(), name='all-borrowed'),
     path('book/<uuid:pk>/renew/', views.renew_book_librarian, name='renew-book-librarian'),
     path('delete/<int:pk>/', views.common_delete, name='common_delete'),
+    path('delete/<uuid:pk>/', views.common_delete, name='common_delete2'),
     path('restore/<int:pk>/', views.common_restore, name='restore'),
+    path('restore/<uuid:pk>/', views.common_restore, name='restore2'),
+    path('bookinstances/', views.BookInstanceListView.as_view(), name='bookinstances'),
+    path('bookinstance/create/', views.BookInstanceCreate.as_view(), name='bookinstance_create'),
+    path('bookinstance/<uuid:pk>/update/', views.BookInstanceUpdate.as_view(), name='bookinstance_update'),
+    path('bookinstance/<uuid:pk>/delete/', views.BookInstanceDelete.as_view(), name='bookinstance_delete'),
+    path('book/<uuid:pk>/lend/', views.lend_book, name='lend-book'),
 ]
