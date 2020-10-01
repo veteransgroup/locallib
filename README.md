@@ -1,11 +1,12 @@
-# Django Local Library
+# Django Public Library
 
-"Local Library" prototype website written in Django by Jeff.
+"Public Library" prototype website written in Django by Jeff 
+<a href="mailto:liubing009@gmail.com">Email to Jeff</a>
 
 
 ## Overview
 
-This web application creates an online catalog for a small local library, where users can browse available books and manage their accounts.
+This web application creates an online catalog for a small public library, where users can browse available books and manage their accounts.
 
 The main features that have currently been implemented are:
 
@@ -52,4 +53,8 @@ To get this project up and running locally on your computer:
 ## Todo functions:
 ### add search and filter
 ### add new models to impl loaning history functions
-### maybe add front-end
+### add user info functions
+### add like and dislike function
+### add member can comment book
+### more business logic like how many times member can renew a book, notificatioins
+### maybe divide it into front and back structure

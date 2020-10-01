@@ -1,25 +1,28 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>Author List</h1>
+<h1>Author List</h1>
 
-    {% if object_list %}
-    <ul>
+{% if object_list %}
+<ul>
 
-      {% for obj in object_list %}
-      <li>
-        <a href="{{ obj.get_absolute_url }}">{{ obj.first_name }}, {{obj.last_name }}</a> ( {{ obj.date_of_birth|date:"F j, Y"}} - 
-        {% if obj.date_of_death %} {{obj.date_of_death|date:"F j, Y"}} {% else %} present {% endif %} )
-        &nbsp; &nbsp; &nbsp; 
-        {% if obj.deleted_at %} 
-          <a href="{% url 'restore' obj.id %}?obj=author"><font size="-1">Restore</font></a> 
-          &nbsp; &nbsp; &nbsp; <font size="-1"><a href="{% url 'author_delete' obj.id %}">Destroy</a></font>
-        {% endif %}
-      </li>
-      {% endfor %}
+  {% for obj in object_list %}
+  <li>
+    <a href="{{ obj.get_absolute_url }}">{{ obj.first_name }}, {{obj.last_name }}</a> (
+    {{ obj.date_of_birth|date:"F j, Y"}} -
+    {% if obj.date_of_death %} {{obj.date_of_death|date:"F j, Y"}} {% else %} present {% endif %} )
+    &nbsp; &nbsp; &nbsp;
+    {% if obj.deleted_at %}
+    <a href="{% url 'restore' obj.id %}?obj=author">
+      <font size="-1">Restore</font>
+    </a>
+    &nbsp; &nbsp; &nbsp; <font size="-1"><a href="{% url 'author_delete' obj.id %}">Destroy</a></font>
+    {% endif %}
+  </li>
+  {% endfor %}
 
-    </ul>
-    {% else %}
-      <p>There are no authors in the database.</p>
-    {% endif %}       
+</ul>
+{% else %}
+<p>There are no authors in the database.</p>
+{% endif %}
 {% endblock %}

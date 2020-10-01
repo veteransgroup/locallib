@@ -1,25 +1,26 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>{% if all %}All{% else %}My{% endif %} Borrowed Books</h1>
+<h1>{% if all %}All{% else %}My{% endif %} Borrowed Books</h1>
 
-    {% if bookinstance_list %}
-    <ul>
+{% if bookinstance_list %}
+<ul>
 
-      {% for bookinst in bookinstance_list %} 
-      <li class="{% if bookinst.is_overdue %}text-danger{% endif %}">
-        <font size="+2"><a href="{% url 'book-detail' bookinst.book.pk %}">{{bookinst.book.title}}</a></font> ({{ bookinst.due_back }})
-      {% if all %}
-        <font size="-1">borrower: {{ bookinst.borrower }}</font>
-      {% endif %}  
-      {% if perms.catalog.can_renew %}
-        --<a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a>
-      {% endif %}
-    </li>
-      {% endfor %}
-    </ul>
+  {% for bookinst in bookinstance_list %}
+  <li class="{% if bookinst.is_overdue %}text-danger{% endif %}">
+    <font size="+2"><a href="{% url 'book-detail' bookinst.book.pk %}">{{bookinst.book.title}}</a></font>
+    ({{ bookinst.due_back }})
+    {% if all %}
+    <font size="-1">borrower: {{ bookinst.borrower }}</font>
+    {% endif %}
+    {% if perms.catalog.can_renew %}
+    --<a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
 
-    {% else %}
-      <p>There are no books borrowed.</p>
-    {% endif %}       
+{% else %}
+<p>There are no books borrowed.</p>
+{% endif %}
 {% endblock %}

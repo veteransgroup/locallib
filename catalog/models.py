@@ -17,6 +17,7 @@ class LibUser(AbstractUser):
     class Meta(AbstractUser.Meta):
         pass
 
+
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,7 +39,7 @@ class Genre(BaseModel):
         String for representing the Model object (in Admin site etc.)
         """
         return self.name
-    
+
     class Meta:
         ordering = ['name']
 
@@ -88,11 +89,11 @@ class Book(BaseModel):
         """
         Creates a string for the Genre. This is required to display genre in Admin.
         """
-        return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
-    display_genre.short_description = 'Genre' 
+        return ', '.join([genre.name for genre in self.genre.all()[:3]])
+    display_genre.short_description = 'Genre'
 
     class Meta:
-        ordering = ['title']   
+        ordering = ['title']
 
 
 class BookInstance(BaseModel):
@@ -104,7 +105,8 @@ class BookInstance(BaseModel):
     book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
-    borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    borrower = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     LOAN_STATUS = (
         ('m', 'Maintenance'),
         ('o', 'On loan'),
@@ -117,7 +119,8 @@ class BookInstance(BaseModel):
 
     class Meta:
         ordering = ['due_back']
-        permissions =(('can_mark_returned','Set book as returned'),('can_renew','Renew a bookinstance'))
+        permissions = (('can_mark_returned', 'Set book as returned'),
+                       ('can_renew', 'Renew a bookinstance'))
 
     def __str__(self):
         """
@@ -130,7 +133,7 @@ class BookInstance(BaseModel):
         Returns the url to access a particular author instance.
         """
         return reverse('bookinstances')
-        
+
     @property
     def is_overdue(self):
         if self.due_back and date.today() > self.due_back:
@@ -158,7 +161,7 @@ class Author(BaseModel):
         String for representing the Model object.
         """
         return '%s, %s' % (self.last_name, self.first_name)
-    
+
     class Meta:
         ordering = ('last_name',)
 
@@ -171,6 +174,8 @@ def when_book_delete(instance, **kwargs):
         instance.cover.delete(False)
 
 # delete file on server when update the Book record's cover
+
+
 @receiver(models.signals.pre_save, sender=Book)
 def when_book_update(instance, **kwargs):
     if instance.pk:

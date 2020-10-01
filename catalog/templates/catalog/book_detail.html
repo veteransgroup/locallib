@@ -1,57 +1,60 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h1>Title: {{ book.title }}</h1>
+<h1>Title: {{ book.title }}</h1>
 
-  <p><strong>Author:</strong>
-    {% if book.author %} 
-      {% if not book.author.deleted_at %}
-        <a href="{% url 'author-detail' book.author.pk %}">{{ book.author }}</a>
-      {% else %}
-        {{ book.author }}
-      {% endif %}
-    {% else %}unkwown
-      {% if perms.catalog.can_mark_returned %} 
-        <font size="-2"><a href="{% url 'author_create' %}?book={{book.id}}">Add Author</a></font>
-      {% endif %}
-    {% endif %}
-  </p>
-  <p><strong>Summary:</strong> {{ book.summary }}</p>
-  <p><strong>ISBN:</strong> {{ book.isbn }}</p> 
-  <p><strong>Language:</strong> {{ book.language }}</p>  
-  <p><strong>Genre:</strong> 
-    {% for genre in book.genre.all %} 
-        {{ genre }}
-        {% if not forloop.last %}
-            , 
-        {% endif %}
-    {% endfor %}</p> 
-    {% if book.cover %}
-        <p><img src="{{ book.cover.url }}"/></p>
-    {% endif %}
-  <hr>
-  {% if perms.catalog.can_mark_returned %}
-    <p><a href="{% url 'book_update' object.id %}">Update info</a>  &nbsp; &nbsp;   
-      &nbsp; &nbsp;  <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p><hr><br>   
-    <p><a href="{% url 'bookinstance_create'%}?book={{object.id}}">Add bookinstance</a></p>
+<p><strong>Author:</strong>
+  {% if book.author %}
+  {% if not book.author.deleted_at %}
+  <a href="{% url 'author-detail' book.author.pk %}">{{ book.author }}</a>
+  {% else %}
+  {{ book.author }}
   {% endif %}
-  <div style="margin-left:20px;margin-top:20px">
-    <h4>Copies</h4>
-    {{ warn }}
-    {% for copy in bookinstance_set.all %}
-    <hr>
-    <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">{{ copy.get_status_display }}</p>
-    {% if copy.status != 'a' %}<p><strong>Due to be returned:</strong> {{copy.due_back}}</p>{% endif %}
-    <p><strong>Imprint:</strong> {{copy.imprint}}</p>
-    <p class="text-muted"><strong>Id:</strong> {{copy.id}}</p>
-    {% if perms.catalog.can_mark_returned %} 
-      {% if copy.borrower %} {{ copy.borrower }}<br> {% endif %}
-      <p><a href="{% url 'bookinstance_update' copy.id %}">Update info</a>&nbsp; &nbsp;   
-       &nbsp; &nbsp;  <a href="{% url 'common_delete2' copy.id %}?del=bookinstance&book={{book.id}}">Delete</a></p>
-    {% endif %}
-    {% if user.is_authenticated and copy.status == 'a' %} 
-        <p><a href="{% url 'lend-book' copy.id %}">Lend book</a></p>
-    {% endif %}
-    {% endfor %}
-  </div>
+  {% else %}unkwown
+  {% if perms.catalog.can_mark_returned %}
+  <font size="-2"><a href="{% url 'author_create' %}?book={{book.id}}">Add Author</a></font>
+  {% endif %}
+  {% endif %}
+</p>
+<p><strong>Summary:</strong> {{ book.summary }}</p>
+<p><strong>ISBN:</strong> {{ book.isbn }}</p>
+<p><strong>Language:</strong> {{ book.language }}</p>
+<p><strong>Genre:</strong>
+  {% for genre in book.genre.all %}
+  {{ genre }}
+  {% if not forloop.last %}
+  ,
+  {% endif %}
+  {% endfor %}</p>
+{% if book.cover %}
+<p><img src="{{ book.cover.url }}" /></p>
+{% endif %}
+<hr>
+{% if perms.catalog.can_mark_returned %}
+<p><a href="{% url 'book_update' object.id %}">Update info</a> &nbsp; &nbsp;
+  &nbsp; &nbsp; <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p>
+<hr><br>
+<p><a href="{% url 'bookinstance_create'%}?book={{object.id}}">Add bookinstance</a></p>
+{% endif %}
+<div style="margin-left:20px;margin-top:20px">
+  <h4>Copies</h4>
+  {{ warn }}
+  {% for copy in bookinstance_set.all %}
+  <hr>
+  <p
+    class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">
+    {{ copy.get_status_display }}</p>
+  {% if copy.status != 'a' %}<p><strong>Due to be returned:</strong> {{copy.due_back}}</p>{% endif %}
+  <p><strong>Imprint:</strong> {{copy.imprint}}</p>
+  <p class="text-muted"><strong>Id:</strong> {{copy.id}}</p>
+  {% if perms.catalog.can_mark_returned %}
+  {% if copy.borrower %} {{ copy.borrower }}<br> {% endif %}
+  <p><a href="{% url 'bookinstance_update' copy.id %}">Update info</a>&nbsp; &nbsp;
+    &nbsp; &nbsp; <a href="{% url 'common_delete2' copy.id %}?del=bookinstance&book={{book.id}}">Delete</a></p>
+  {% endif %}
+  {% if user.is_authenticated and copy.status == 'a' %}
+  <p><a href="{% url 'lend-book' copy.id %}">Lend book</a></p>
+  {% endif %}
+  {% endfor %}
+</div>
 {% endblock %}

@@ -1,23 +1,23 @@
 {% extends "base_generic.html" %}
 {% block content %}
 
-    <h1>Book: {{bookinst.book.title}}</h1>
-    <p>Book summary: {{bookinst.book.summary | truncatewords:50}}</p>
-    <p>
-        {% if bookinst.book.cover %}
-        <img src="{{ bookinst.book.cover.url }}"  style="max-width: 20%; border-radius: 10%;" class="col-md-4"/>
-        {% endif %}
-    </p>
-    <p>Book id: {{bookinst.id}}</p>
-    <p>Imprint: {{ bookinst.imprint }}</p>
-    <p>Borrower: {{user}}</p>
-    
-    <form action="" method="post">
-        {% csrf_token %}
-        <table>
+<h1>Book: {{bookinst.book.title}}</h1>
+<p>Book summary: {{bookinst.book.summary | truncatewords:50}}</p>
+<p>
+    {% if bookinst.book.cover %}
+    <img src="{{ bookinst.book.cover.url }}" style="max-width: 20%; border-radius: 10%;" class="col-md-4" />
+    {% endif %}
+</p>
+<p>Book id: {{bookinst.id}}</p>
+<p>Imprint: {{ bookinst.imprint }}</p>
+<p>Borrower: {{user}}</p>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <table>
         {{ form }}
-        </table>
-        <input type="submit" value="Submit" />
-    </form>
+    </table>
+    <input type="submit" value="Submit" />
+</form>
 
 {% endblock %}
