@@ -289,3 +289,43 @@ def common_restore(request, pk):
     obj.deleted_at = None
     obj.save()
     return redirect(redirect_to)
+
+
+class BookInstanceListView(generic.ListView):
+    model = BookInstance
+    paginate_by = settings.PAGE_SIZE
+    def get_queryset(self):
+        if self.request.GET.get('del') is not None:
+            return BookInstance.objects.filter(deleted_at__isnull=False)
+        return BookInstance.objects.filter(deleted_at=None)
+
+class BookInstanceDetailView(generic.DetailView):
+    model = BookInstance
+
+class BookInstanceCreate(CreateView):
+    model = BookInstance
+    fields = ('book','imprint','status')
+    initial={'status':'a',}
+    template_name ='catalog/author_form.html'
+
+    def get_initial(self):
+        initial_data = super().get_initial()
+        initial_data['book'] = self.request.GET.get('book')
+        return initial_data
+
+    def get_success_url(self):
+        if self.request.GET.get('book'):
+            return reverse('book-detail', kwargs={'pk': self.request.GET.get('book')})
+        return reverse('bookinstance-detail', kwargs={'pk': self.object.pk})
+
+
+class BookInstanceUpdate(UpdateView):
+    model = BookInstance
+    fields = ('book','imprint','status','borrower','status')
+    
+
+class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
+    model = BookInstance
+    success_url = reverse_lazy('bookinstances')
+    permission_required = 'catalog.can_mark_returned'
+

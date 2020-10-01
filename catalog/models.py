@@ -124,6 +124,12 @@ class BookInstance(BaseModel):
         String for representing the Model object
         """
         return '%s (%s)' % (self.id, self.book.title)
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular author instance.
+        """
+        return reverse('bookinstance-detail', args=[str(self.id)])
         
     @property
     def is_overdue(self):

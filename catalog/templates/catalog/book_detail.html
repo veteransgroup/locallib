@@ -31,8 +31,9 @@
     {% endif %}
   <hr>
   {% if perms.catalog.can_mark_returned %}
-     <p><a href="{% url 'book_update' object.id %}">Update info</a>  &nbsp; &nbsp;   
-      &nbsp; &nbsp;  <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p>
+    <p><a href="{% url 'book_update' object.id %}">Update info</a>  &nbsp; &nbsp;   
+      &nbsp; &nbsp;  <a href="{% url 'common_delete' object.id %}?del=book">Delete</a></p>   
+    <p><a href="{% url 'bookinstance_create'%}?book={{object.id}}">Add bookinstance</a></p>
   {% endif %}
   <div style="margin-left:20px;margin-top:20px">
     <h4>Copies</h4>
@@ -43,6 +44,8 @@
     {% if copy.status != 'a' %}<p><strong>Due to be returned:</strong> {{copy.due_back}}</p>{% endif %}
     <p><strong>Imprint:</strong> {{copy.imprint}}</p>
     <p class="text-muted"><strong>Id:</strong> {{copy.id}}</p>
+    <!-- <p><a href="{% url 'bookinstance_update' copy.id %}">Update info</a>&nbsp; &nbsp;   
+       &nbsp; &nbsp;  <a href="{% url 'bookinstance_delete' copy.id %}">Delete</a></p> -->
     {% endfor %}
   </div>
 {% endblock %}

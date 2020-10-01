@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Book Instance List</h1>
+
+    {% if object_list %}
+    <ul>
+
+      {% for book in object_list %}
+      <li>
+        <a href="{% url 'book-detail' book.book.id %}">{{ book.book.title }}</a> ({{book.book.author}})
+        &nbsp; &nbsp; &nbsp; 
+        {{ book.imprint }}
+        &nbsp; &nbsp; {{ book.status }} <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">{{ copy.get_status_display }}</p>
+        &nbsp; &nbsp; {{ book.borrower }} 
+        &nbsp; &nbsp; {{ book.due_back }} &nbsp; &nbsp; &nbsp; 
+        {% if book.deleted_at %} 
+          <a href="{% url 'restore' book.id %}?obj=bookinstance"><font size="-1">Restore</font></a> 
+          &nbsp; &nbsp; &nbsp; <a href="{% url 'bookinstance_delete' book.id %}"><font size="-1">Destroy</font></a>
+        {% endif %}
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no books in the library.</p>
+    {% endif %}       
+{% endblock %}

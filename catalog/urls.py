@@ -19,4 +19,9 @@ urlpatterns = [
     path('book/<uuid:pk>/renew/', views.renew_book_librarian, name='renew-book-librarian'),
     path('delete/<int:pk>/', views.common_delete, name='common_delete'),
     path('restore/<int:pk>/', views.common_restore, name='restore'),
+    path('bookinstances/', views.BookInstanceListView.as_view(), name='bookinstances'),
+    path('bookinstance/<int:pk>', views.BookInstanceDetailView.as_view(), name='bookinstance-detail'),
+    path('bookinstance/create/', views.BookInstanceCreate.as_view(), name='bookinstance_create'),
+    path('bookinstance/<int:pk>/update/', views.BookInstanceUpdate.as_view(), name='bookinstance_update'),
+    path('bookinstance/<int:pk>/delete/', views.BookInstanceDelete.as_view(), name='bookinstance_delete'),
 ]
