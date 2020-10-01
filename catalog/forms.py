@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 import datetime #for checking renewal date range.
-from django.contrib.auth.models import User
+from catalog.models import LibUser
     
 class RenewBookForm(forms.Form):
     renewal_date = forms.DateField(help_text="Enter a date between now and 4 weeks (default 3 weeks).")
@@ -25,5 +25,5 @@ class RenewBookForm(forms.Form):
 
 class RegisterForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ('username', 'email',)
+        model = LibUser
+        fields = ('username', 'email', 'card_No', 'phone')

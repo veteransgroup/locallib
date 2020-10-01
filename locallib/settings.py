@@ -142,7 +142,7 @@ WSGI_APPLICATION = 'locallib.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DJANGO_DB_NAME','libdb'),
+        'NAME': os.environ.get('DJANGO_DB_NAME','librarydb'),
         'USER': os.environ.get('DJANGO_DB_USER','postgres'),
         'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD','postgres'),
         'HOST': os.environ.get('DJANGO_DB_HOST','192.168.1.162'),
@@ -169,16 +169,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'catalog.LibUser'
+
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'common.functions.EmailBackend',
+    'common.functions.CardNoBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'zh-hans'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Pacific/Auckland'
 

@@ -3,11 +3,19 @@ from django.urls import reverse
 import uuid
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 import logging
 from datetime import date
-# Create your models here.
+from django.conf import settings
 
+
+class LibUser(AbstractUser):
+    card_No = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20)
+    photo = models.ImageField(null=True, blank=True, upload_to="photo")
+
+    class Meta(AbstractUser.Meta):
+        pass
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -96,7 +104,7 @@ class BookInstance(BaseModel):
     book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
-    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     LOAN_STATUS = (
         ('m', 'Maintenance'),
         ('o', 'On loan'),
@@ -149,12 +157,14 @@ class Author(BaseModel):
         ordering = ('last_name',)
 
 
+# delete file on server when delete the Book record
 @receiver(pre_delete, sender=Book)
 def when_book_delete(instance, **kwargs):
     # logging.warning(**kwargs)
     if instance.pk and instance.cover:
         instance.cover.delete(False)
 
+# delete file on server when update the Book record's cover
 @receiver(models.signals.pre_save, sender=Book)
 def when_book_update(instance, **kwargs):
     if instance.pk:

@@ -43,8 +43,8 @@
                         <li><a href="{% url 'account_logout'%}?next={{request.path}}">Logout</a></li>   
                     {% else %}
                         <li><a href="{% url 'account_login'%}?next={{request.path}}">Login</a></li>
-                        <li><a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a></li>  
-                        <!-- <li><a href="{% url 'register' %}?next={{request.path}}">old sign up</a></li>    -->
+                        <!-- <li><a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a></li>   -->
+                        <li><a href="{% url 'register' %}?next={{request.path}}">Sign up</a></li>   
                     {% endif %} 
                     <br>
                     {% if perms.catalog.can_mark_returned %}
