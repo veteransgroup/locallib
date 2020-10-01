@@ -1,5 +1,4 @@
 # locallib
-## Practice with MDN's Django tutorial
 
 ## Todo functions:
 ### add register -- done

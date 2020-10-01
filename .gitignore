@@ -1,4 +1,4 @@
-logs
+
 *.py[cod]
 .coverage
 MANIFEST
@@ -33,3 +33,10 @@ dist
 __pycache__
 images
 uploads
+logs/django_request.log
+logs/django_request.log.2020-09-23
+logs/django_request.log.2020-09-24
+logs/django_request.log.2020-09-25
+logs/django_request.log.2020-09-26
+logs/errors.log
+logs/info.log
