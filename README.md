@@ -1,7 +1,6 @@
 # Django Public Library
 
-"Public Library" prototype website written in Django by Jeff 
-<a href="mailto:liubing009@gmail.com">Email to Jeff</a>
+"Public Library" prototype website written in Django by <a href="mailto:liubing009@gmail.com">Jeff</a>
 
 
 ## Overview
