@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import logging
+from django.contrib import messages
 
 
 @csrf_exempt
@@ -161,11 +162,9 @@ def renew_book_librarian(request, pk):
 def lend_book(request, pk):
     book_inst = get_object_or_404(BookInstance, pk=pk)
     user = get_object_or_404(LibUser, username=request.user)
-    print('lend book', user, user.email)
     if user.email is None or user.email == '':
-        print('come to detail of user')
-        return render(request, 'catalog/libuser_detail.html', {'warn':'You can lend book instance after you register your email.'})
-    print('left out to detail of user')
+        messages.add_message(request, messages.INFO, 'You can lend book instance after you register your email.')
+        return HttpResponseRedirect(reverse('user-detail', kwargs={'pk': user.id}))
     if request.method == 'POST':
         form = RenewBookForm(request.POST)
         if form.is_valid():
@@ -190,7 +189,7 @@ class AuthorCreate(LoginRequiredMixin, CreateView):
     # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性
 
     # initial 属性可以在新建记录时设置字段的默认值
-    initial = {'date_of_death': '05/01/2089', }
+    # initial = {'date_of_death': '05/01/2089', }
     # 成功后默认跳转地址为模型类里定义的 get_absolute_url 方法
     # 覆写 get_success_url 可修改成功后跳转的地址；我在此做了额外的业务逻辑（视情况update关联记录:如果是从 book 记录入口创建 author，那么book的 author 值改为新增的 author）
 
@@ -282,6 +281,7 @@ def common_delete(request, pk):
         book_id = request.GET.get('book')
         if obj.status == 'o':
             book = get_object_or_404(Book, pk=book_id)
+            messages.add_message(request, messages.WARNING, "Can't delete this book instance due to its on loan status")
             return render(request, 'catalog/book_detail.html', {'book': book, 'object': book,
                                                                 'warn': "Can't delete this book instance due to its on loan status",
                                                                 'bookinstance_set': BookInstance.objects.filter(deleted_at=None).filter(book=book).order_by('-status')})
@@ -290,12 +290,10 @@ def common_delete(request, pk):
     else:
         return reverse('index')
     if obj.deleted_at is None:
-        print("Fake del")
         obj.deleted_at = timezone.now()
         obj.save()
         return redirect(redirect_to)
     else:
-        print("Real del")
         return redirect(redirect_to_del)
 
 
@@ -366,6 +364,7 @@ class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
         self.object = self.get_object()
         if self.object.status == 'o' and self.object.borrower is not None:
             # return HttpResponseRedirect(reverse('bookinstances'))
+            messages.add_message(request, messages.ERROR, "Can't delete this book instance due to its on loan by %s" % self.object.borrower)
             return render(request, 'catalog/bookinstance_list.html', {'object_list': BookInstance.objects.all(),
                                                                       'warn': "Can't delete this book instance due to its on loan by %s" % self.object.borrower})
         else:
