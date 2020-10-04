@@ -52,7 +52,6 @@ To get this project up and running locally on your computer:
 ## Todo functions:
 ### add search and filter
 ### add new models to impl loaning history functions
-### add user info functions
 ### add like and dislike function
 ### add member can comment book
 ### more business logic like how many times member can renew a book, notificatioins
