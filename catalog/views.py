@@ -189,7 +189,7 @@ class AuthorCreate(LoginRequiredMixin, CreateView):
     # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性
 
     # initial 属性可以在新建记录时设置字段的默认值
-    initial = {'date_of_death': '05/01/2089', }
+    # initial = {'date_of_death': '05/01/2089', }
     # 成功后默认跳转地址为模型类里定义的 get_absolute_url 方法
     # 覆写 get_success_url 可修改成功后跳转的地址；我在此做了额外的业务逻辑（视情况update关联记录:如果是从 book 记录入口创建 author，那么book的 author 值改为新增的 author）
 
