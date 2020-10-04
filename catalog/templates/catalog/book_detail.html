@@ -27,7 +27,9 @@
   {% endif %}
   {% endfor %}</p>
 {% if book.cover %}
-<p><img src="{{ book.cover.url }}" /></p>
+<div class="container">
+  <p><img src="{{ book.cover.url }}" class="img-responsive" /></p>
+</div>
 {% endif %}
 <hr>
 {% if perms.catalog.can_mark_returned %}

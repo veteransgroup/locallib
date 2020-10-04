@@ -5,22 +5,37 @@
 
 {% if object_list %}
 <ul>
-
-  {% for obj in object_list %}
-  <li>
-    <a href="{{ obj.get_absolute_url }}">{{ obj.first_name }}, {{obj.last_name }}</a> (
-    {{ obj.date_of_birth|date:"F j, Y"}} -
-    {% if obj.date_of_death %} {{obj.date_of_death|date:"F j, Y"}} {% else %} present {% endif %} )
-    &nbsp; &nbsp; &nbsp;
-    {% if obj.deleted_at %}
-    <a href="{% url 'restore' obj.id %}?obj=author">
-      <font size="-1">Restore</font>
-    </a>
-    &nbsp; &nbsp; &nbsp; <font size="-1"><a href="{% url 'author_delete' obj.id %}">Destroy</a></font>
-    {% endif %}
-  </li>
-  {% endfor %}
-
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <td>Author</td>
+        <td>Date of birth</td>
+        <td>Date of death</td>
+        {% if book.deleted_at %}
+        <td>Operate</td>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in object_list %}
+      <tr>
+        <td><a href="{{ obj.get_absolute_url }}">{{ obj.first_name }}, {{obj.last_name }}</a></td>
+        <td>{% if obj.date_of_birth %} {{ obj.date_of_birth|date:"F j, Y"}}{% else %} unknown {% endif %}</td>
+        <td>
+          {% if obj.date_of_death %} {{obj.date_of_death|date:"F j, Y"}} {% else %} present {% endif %}
+        </td>
+        {% if obj.deleted_at %}
+        <td>
+          <a href="{% url 'restore' obj.id %}?obj=author">
+            <font size="-1">Restore</font>
+          </a>
+          &nbsp; &nbsp; &nbsp; <font size="-1"><a href="{% url 'author_delete' obj.id %}">Destroy</a></font>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </ul>
 {% else %}
 <p>There are no authors in the database.</p>

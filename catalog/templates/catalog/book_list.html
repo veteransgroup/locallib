@@ -5,22 +5,35 @@
 
 {% if book_list %}
 <ul>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <td>Book</td>
+        <td>Author</td>
+        {% if book.deleted_at %}
+        <td>Operate</td>
+        {% endif %}
+      </tr>
+    </thead>
+    {% for book in book_list %}
+    <tr>
+      <td><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></td>
+      <td> ({{book.author}})</td>
 
-  {% for book in book_list %}
-  <li>
-    <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{book.author}})
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-    {% if book.deleted_at %}
-    <a href="{% url 'restore' book.id %}?obj=book">
-      <font size="-1">Restore</font>
-    </a>
-    &nbsp; &nbsp; &nbsp; <a href="{% url 'book_delete' book.id %}">
-      <font size="-1">Destroy</font>
-    </a>
-    {% endif %}
-  </li>
-  {% endfor %}
+      {% if book.deleted_at %}
+      <td>
+        <a href="{% url 'restore' book.id %}?obj=book">
+          <font size="-1">Restore</font>
+        </a>
+        &nbsp; &nbsp; &nbsp; <a href="{% url 'book_delete' book.id %}">
+          <font size="-1">Destroy</font>
+        </a>
+      </td>
+      {% endif %}
 
+    </tr>
+    {% endfor %}
+  </table>
 </ul>
 {% else %}
 <p>There are no books in the library.</p>

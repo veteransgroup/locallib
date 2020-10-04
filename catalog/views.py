@@ -146,7 +146,7 @@ def renew_book_librarian(request, pk):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             book_inst.due_back = form.cleaned_data['renewal_date']
             book_inst.save()
-
+            messages.add_message(request, messages.INFO, "The book has renewed to %s" % form.cleaned_data['renewal_date'])
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('all-borrowed'))
 
@@ -172,6 +172,7 @@ def lend_book(request, pk):
             book_inst.borrower = request.user
             book_inst.status = 'o'
             book_inst.save()
+            messages.add_message(request, messages.INFO, "You have lended book: %s" % book_inst.book.title)
             return HttpResponseRedirect(reverse('my-borrowed'))
     else:
         proposed_return_date = datetime.date.today() + datetime.timedelta(weeks=3)
@@ -195,6 +196,7 @@ class AuthorCreate(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         book_pk = self.request.GET.get('book')
+        messages.add_message(self.request, messages.SUCCESS, "Added author: %s" % self.object)
         if book_pk is not None:
             book = get_object_or_404(Book, pk=book_pk)
             book.author = self.object     # self.object 为当前对象
@@ -238,6 +240,7 @@ class BookCreate(LoginRequiredMixin, CreateView):
 
     # 覆写 get_success_url 修改成功后跳转的地址，从哪里来回哪里去
     def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Added book: %s" % self.object)
         if self.request.GET.get('author'):
             return reverse('author-detail', kwargs={'pk': self.request.GET.get('author')})
         return reverse('book-detail', kwargs={'pk': self.object.pk})
@@ -292,6 +295,7 @@ def common_delete(request, pk):
     if obj.deleted_at is None:
         obj.deleted_at = timezone.now()
         obj.save()
+        messages.add_message(request, messages.SUCCESS, "Success deleted: %s" % obj)
         return redirect(redirect_to)
     else:
         return redirect(redirect_to_del)
@@ -316,6 +320,7 @@ def common_restore(request, pk):
 
     obj.deleted_at = None
     obj.save()
+    messages.add_message(request, messages.SUCCESS, "Success restored: %s" % obj)
     return redirect(redirect_to)
 
 
@@ -343,6 +348,7 @@ class BookInstanceCreate(PermissionRequiredMixin, CreateView):
         return initial_data
 
     def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Added book instance: %s" % self.object)
         if self.request.GET.get('book'):
             return reverse('book-detail', kwargs={'pk': self.request.GET.get('book')})
         return reverse('bookinstances')

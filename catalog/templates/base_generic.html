@@ -19,36 +19,39 @@
 <body>
 
     <style>
-.nav { 
-    list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 150px;
-  background-color: #f1f1f1;
-  height: 100%; /* Full height */
-  position: fixed; /* Make it stick, even on scroll */
-  overflow: auto; /* Enable scrolling if the sidenav has too much content */
-}
+        .nav {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 150px;
+            background-color: #f1f1f1;
+            height: 100%;
+            /* Full height */
+            position: fixed;
+            /* Make it stick, even on scroll */
+            overflow: auto;
+            /* Enable scrolling if the sidenav has too much content */
+        }
 
-li a {
-  display: block;
-  color: #000;
-  padding: 10px 16px;
-  text-decoration: none;
-}
+        li a {
+            display: block;
+            color: #000;
+            padding: 10px 16px;
+            text-decoration: none;
+        }
 
-/* Change the link color on hover */
-li a:hover {
-  width: 150px;
-  background-color: rgb(192, 192, 192);
-  color: rgb(255, 255, 255);
-}
+        /* Change the link color on hover */
+        li a:hover {
+            width: 150px;
+            background-color: rgb(192, 192, 192);
+            color: rgb(255, 255, 255);
+        }
 
-.active {
-  width: 150px;
-  background-color: #4CAF50;
-  color: white;
-}
+        .active {
+            width: 150px;
+            background-color: #4CAF50;
+            color: white;
+        }
     </style>
 
     <div class="container-fluid">
@@ -66,33 +69,33 @@ li a:hover {
             <div class="col-sm-2">
                 {% block sidebar %}
                 <div class="nav">
-                <ul class="sidebar-nav">
-                    <li><a href="{% url 'index' %}" class="active">Home</a></li>
-                    <li><a href="{% url 'books' %}">All books</a></li>
-                    <li><a href="{% url 'authors' %}">All authors</a></li>
-                    <br>
-                    {% if user.is_authenticated %}
-                    <li>User: {{ user.get_username }}</li>
-                    <li><a href="{% url 'user-detail' user.id %}?next={{request.path}}">My Account</a></li>
-                    <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
-                    <li><a href="{% url 'account_logout'%}?next={{request.path}}">Logout</a></li>
-                    {% else %}
-                    <li><a href="{% url 'account_login'%}?next={{request.path}}">Login</a></li>
-                    <li><a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a></li>                      
-                    {% endif %}
-                    <br>
-                    {% if perms.catalog.can_mark_returned %}
-                    <li>Librarian</li>
-                    <li><a href="{% url 'all-borrowed' %}">All borrowed</a></li>
-                    <li><a href="{% url 'bookinstances' %}">All Book instances</a></li>
-                    <br>
-                    <li><a href="{% url 'book_create' %}">Add Book</a></li>
-                    <li><a href="{% url 'author_create' %}">Add Author</a></li>
-                    <br>
-                    <li><a href="{% url 'books' %}?del=y">Books in ashcan</a></li>
-                    <li><a href="{% url 'authors' %}?del=y">Author in ashcan</a></li>
-                    {% endif%}
-                </ul>
+                    <ul class="sidebar-nav">
+                        <li><a href="{% url 'index' %}">Home</a></li>
+                        <li><a href="{% url 'books' %}">All books</a></li>
+                        <li><a href="{% url 'authors' %}">All authors</a></li>
+                        <br>
+                        {% if user.is_authenticated %}
+                        <li>User: {{ user.get_username }}</li>
+                        <li><a href="{% url 'user-detail' user.id %}?next={{request.path}}">My Account</a></li>
+                        <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
+                        <li><a href="{% url 'account_logout'%}?next={{request.path}}">Logout</a></li>
+                        {% else %}
+                        <li><a href="{% url 'account_login'%}?next={{request.path}}">Login</a></li>
+                        <li><a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a></li>
+                        {% endif %}
+                        <br>
+                        {% if perms.catalog.can_mark_returned %}
+                        <li>Librarian</li>
+                        <li><a href="{% url 'all-borrowed' %}">All borrowed</a></li>
+                        <li><a href="{% url 'bookinstances' %}">All Book instances</a></li>
+                        <br>
+                        <li><a href="{% url 'book_create' %}">Add Book</a></li>
+                        <li><a href="{% url 'author_create' %}">Add Author</a></li>
+                        <br>
+                        <li><a href="{% url 'books' %}?del=y">Books in ashcan</a></li>
+                        <li><a href="{% url 'authors' %}?del=y">Author in ashcan</a></li>
+                        {% endif%}
+                    </ul>
                 </div>
                 {% endblock %}
             </div>

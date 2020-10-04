@@ -5,7 +5,20 @@
 <!-- {{ warn }} -->
 {% if object_list %}
 <ul>
-  <table class="table">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <td>Book</td>
+        <td>Author</td>
+        <td>Imprint</td>
+        <td>Status</td>
+        <td>Borrower</td>
+        <td>Due date</td>
+        <td></td>
+        <td>Operate</td>
+        <td></td>
+      </tr>
+    </thead>
     {% for bookinstance in object_list %}
     <tr>
       <td>

@@ -5,19 +5,37 @@
 
 {% if bookinstance_list %}
 <ul>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <td>Book</td>
+        <td>Due date</td>
+        {% if all %}
+        <td>Borrower</td>
+        {% endif %}
+        {% if perms.catalog.can_renew %}
+        <td>Operate</td>
+        {% endif %}
 
-  {% for bookinst in bookinstance_list %}
-  <li class="{% if bookinst.is_overdue %}text-danger{% endif %}">
-    <font size="+2"><a href="{% url 'book-detail' bookinst.book.pk %}">{{bookinst.book.title}}</a></font>
-    ({{ bookinst.due_back }})
-    {% if all %}
-    <font size="-1">borrower: {{ bookinst.borrower }}</font>
-    {% endif %}
-    {% if perms.catalog.can_renew %}
-    --<a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a>
-    {% endif %}
-  </li>
-  {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for bookinst in bookinstance_list %}
+      <tr class="{% if bookinst.is_overdue %}text-danger{% endif %}">
+        <td><a href="{% url 'book-detail' bookinst.book.pk %}">{{bookinst.book.title}}</a></td>
+        <td> ({{ bookinst.due_back }}) </td>
+
+        {% if all %}
+        <td>{{ bookinst.borrower }}</td>
+        {% endif %}
+        {% if perms.catalog.can_renew %}
+        <td><a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a></td>
+        {% endif %}
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </ul>
 
 {% else %}

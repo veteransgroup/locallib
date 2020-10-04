@@ -26,7 +26,9 @@
     <p>{{ book.summary | truncatewords:30 }}</p>
     <br>
     {% if book.cover %}
-    <img src="{{ book.cover.url }}" style="max-width: 36%; border-radius: 10%;" class="col-md-4" />
+    <div class="container">
+      <img src="{{ book.cover.url }}" style="max-width: 36%; border-radius: 10%;" class="col-md-4" />
+    </div>
     {% endif %}
   </li>
   {% endfor %}
