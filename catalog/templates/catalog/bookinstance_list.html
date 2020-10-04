@@ -23,7 +23,7 @@
     <tr>
       <td>
         <a href="{% url 'book-detail' bookinstance.book.id %}">{{ bookinstance.book.title }}</a></td>
-      <td>({% if bookinstance.book.author %} {{bookinstance.book.author}} {% else %} unknown {% endif %})</td>
+      <td>{% if bookinstance.book.author %} {{bookinstance.book.author}} {% else %} unknown {% endif %}</td>
       <td>{% if bookinstance.imprint %} {{ bookinstance.imprint }} {% endif %}</td>
       <td
         class="{% if bookinstance.status == 'a' %}text-success{% elif bookinstance.status == 'm' %}text-danger{% else %}text-warning{% endif %}">

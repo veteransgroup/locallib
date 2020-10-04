@@ -69,6 +69,12 @@ class BookListView(generic.ListView):
             return Book.objects.filter(deleted_at__isnull=False)
         return Book.objects.filter(deleted_at=None)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('del') is not None:
+            context['admin']='Yes'
+        return context
+
 
 class BookDetailView(generic.DetailView):
     # DetailView 默认的模板为 <模型名>_detail.html
@@ -92,6 +98,12 @@ class AuthorListView(generic.ListView):
             return Author.objects.filter(deleted_at__isnull=False)
         return Author.objects.filter(deleted_at__isnull=True)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('del') is not None:
+            context['admin']='Yes'
+        return context
+        
 
 class AuthorDetailView(generic.DetailView):
     model = Author

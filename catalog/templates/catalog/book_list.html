@@ -9,8 +9,11 @@
     <thead>
       <tr>
         <td>Book</td>
+        <td>Genre</td>
+        <td>Language</td>
+        <td>Summary</td>
         <td>Author</td>
-        {% if book.deleted_at %}
+        {% if perms.catalog.can_mark_returned and admin %}
         <td>Operate</td>
         {% endif %}
       </tr>
@@ -18,7 +21,10 @@
     {% for book in book_list %}
     <tr>
       <td><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></td>
-      <td> ({{book.author}})</td>
+      <td>{{ book.display_genre }}</td>
+      <td>{{ book.language }}</td>
+      <td>{{ book.summary | truncatewords:10 }}</td>
+      <td>{{book.author}}</td>
 
       {% if book.deleted_at %}
       <td>

@@ -12,6 +12,7 @@
         <td>Due date</td>
         {% if all %}
         <td>Borrower</td>
+        <td>Imprint</td>
         {% endif %}
         {% if perms.catalog.can_renew %}
         <td>Operate</td>
@@ -23,10 +24,11 @@
       {% for bookinst in bookinstance_list %}
       <tr class="{% if bookinst.is_overdue %}text-danger{% endif %}">
         <td><a href="{% url 'book-detail' bookinst.book.pk %}">{{bookinst.book.title}}</a></td>
-        <td> ({{ bookinst.due_back }}) </td>
+        <td>{{ bookinst.due_back }}</td>
 
         {% if all %}
         <td>{{ bookinst.borrower }}</td>
+        <td>{{ bookinst.imprint }}</td>
         {% endif %}
         {% if perms.catalog.can_renew %}
         <td><a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a></td>

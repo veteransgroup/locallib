@@ -11,7 +11,7 @@
         <td>Author</td>
         <td>Date of birth</td>
         <td>Date of death</td>
-        {% if book.deleted_at %}
+        {% if perms.catalog.can_mark_returned and admin %}
         <td>Operate</td>
         {% endif %}
       </tr>
