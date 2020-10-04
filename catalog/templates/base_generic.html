@@ -38,13 +38,12 @@
                     <br>
                     {% if user.is_authenticated %}
                     <li>User: {{ user.get_username }}</li>
+                    <li><a href="{% url 'user-detail' user.id %}?next={{request.path}}">My Account</a></li>
                     <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
-                    <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
                     <li><a href="{% url 'account_logout'%}?next={{request.path}}">Logout</a></li>
                     {% else %}
                     <li><a href="{% url 'account_login'%}?next={{request.path}}">Login</a></li>
-                    <!-- <li><a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a></li>   -->
-                    <li><a href="{% url 'register' %}?next={{request.path}}">Sign up</a></li>
+                    <li><a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a></li>                      
                     {% endif %}
                     <br>
                     {% if perms.catalog.can_mark_returned %}

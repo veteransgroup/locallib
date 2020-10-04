@@ -142,10 +142,10 @@ WSGI_APPLICATION = 'locallib.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DJANGO_DB_NAME', 'postgres'),
+        'NAME': os.environ.get('DJANGO_DB_NAME', 'librarydb'),
         'USER': os.environ.get('DJANGO_DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DJANGO_DB_HOST', 'db'),
+        'HOST': os.environ.get('DJANGO_DB_HOST', '192.168.1.162'),
         'PORT': os.environ.get('DJANGO_DB_PORT', '5432'),
     }
 }

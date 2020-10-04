@@ -19,7 +19,7 @@ from django.conf.urls import include
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from catalog.views import register
+from catalog import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,7 +27,8 @@ urlpatterns = [
     # path('accounts/', include('django.contrib.auth.urls')),
     path('catalog/', include('catalog.urls')),
     path('', RedirectView.as_view(url='/catalog/', permanent=True)),
-    path('accounts/register/', register, name='register'),
+    path('accounts/<int:pk>', views.UserDetailView.as_view(), name='user-detail'),
+    path('accounts/<int:pk>/update/', views.UserUpdateView.as_view(), name='user_update'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

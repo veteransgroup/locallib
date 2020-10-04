@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>{{ user.username }}'s profile</h1>
+
+<p><strong>Username:</strong> {{ user.username }}</p>
+<p><strong>First name:</strong> {{ user.first_name }}</p>
+<p><strong>Last name:</strong> {{ user.last_name }}</p>
+<p><strong>Email:</strong>{% if user.email %} {{ user.email }} {% else %} Please fill up your email address and confirm from your email {% endif %}&nbsp;&nbsp;&nbsp; <a href="{% url 'account_email' %}">Change E-mail</a></p>
+<p><strong>Card No:</strong> {{ user.card_No }}</p>
+<p><strong>Phone:</strong> {{ user.phone }}</p>
+<hr>
+<p><a href="{% url 'user_update' user.id %}">Change info</a></p>
+<hr>
+{% if warn %}{{warn}}{%else%}You can use your username, email or card_no login this system!{%endif%}
+<hr>
+{% if user.photo %}
+<p><img src="{{ user.photo.url }}" style="max-width: 33%; border-radius: 5%;" class="col-md-4"/></p>
+{% endif %}
+
+
+{% endblock %}

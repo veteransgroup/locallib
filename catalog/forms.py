@@ -1,9 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm
 import datetime #for checking renewal date range.
-from catalog.models import LibUser
 
 
 class RenewBookForm(forms.Form):
@@ -22,9 +20,3 @@ class RenewBookForm(forms.Form):
 
         # Remember to always return the cleaned data.
         return data
-
-
-class RegisterForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = LibUser
-        fields = ('username', 'email', 'card_No', 'phone')

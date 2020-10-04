@@ -1,5 +1,4 @@
 from django.views.generic import DeleteView
-from catalog.forms import RegisterForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import RenewBookForm
@@ -11,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from catalog.models import Author, Book, BookInstance
+from catalog.models import Author, Book, BookInstance, LibUser
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils import timezone
@@ -161,6 +160,12 @@ def renew_book_librarian(request, pk):
 @login_required
 def lend_book(request, pk):
     book_inst = get_object_or_404(BookInstance, pk=pk)
+    user = get_object_or_404(LibUser, username=request.user)
+    print('lend book', user, user.email)
+    if user.email is None or user.email == '':
+        print('come to detail of user')
+        return render(request, 'catalog/libuser_detail.html', {'warn':'You can lend book instance after you register your email.'})
+    print('left out to detail of user')
     if request.method == 'POST':
         form = RenewBookForm(request.POST)
         if form.is_valid():
@@ -257,24 +262,6 @@ class BookDelete(PermissionRequiredMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['flag'] = True
         return context
-
-
-def register(request):
-    redirect_to = request.POST.get('next', request.GET.get('next', ''))
-
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            if redirect_to:
-                return redirect(redirect_to)
-            else:
-                return redirect(reverse('login'))
-    else:
-        form = RegisterForm()
-
-    return render(request, 'registration/register.html', context={'form': form, 'next': redirect_to})
 
 
 @permission_required('catalog.can_renew')
@@ -383,3 +370,12 @@ class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
                                                                       'warn': "Can't delete this book instance due to its on loan by %s" % self.object.borrower})
         else:
             return super().delete(request, *args, **kwargs)
+
+
+class UserDetailView(LoginRequiredMixin, generic.DetailView):
+    model = LibUser
+
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = LibUser
+    fields = ['first_name', 'last_name', 'card_No', 'phone', 'photo']

@@ -14,6 +14,12 @@ class LibUser(AbstractUser):
     phone = models.CharField(max_length=20)
     photo = models.ImageField(null=True, blank=True, upload_to="photo")
 
+    def __str__(self):
+        return self.username
+
+    def get_absolute_url(self):
+        return reverse('user-detail', args=[str(self.id)])
+
     class Meta(AbstractUser.Meta):
         pass
 
