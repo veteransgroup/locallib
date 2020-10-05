@@ -36,7 +36,7 @@
         li a {
             display: block;
             color: #000;
-            padding: 10px 20px;
+            padding: 4px 20px;
             text-decoration: none;
         }
 
@@ -67,17 +67,17 @@
         </div>
         <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
             {% if perms.catalog.can_mark_returned %}
-            <li>
-                <strong>
+            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
+                <a>
                     Librarian
-                </strong>
+                </a>
             </li>
             {% endif %}
             {% if user.is_authenticated %}
-            <li class="btn-bd-download  d-lg-inline-block mb-6 mb-md-0 ml-md-5">
-                <strong>
+            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
+                <a>
                     {{ user.get_username }}
-                </strong>
+                </a>
             </li>
             <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
                 <a href="{% url 'user-detail' user.id %}?next={{request.path}}" class="text-white">My Account</a>
@@ -90,7 +90,7 @@
                 <a href="{% url 'account_login'%}?next={{request.path}}" class="text-white">Login</a>
             </li>
             <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a href="{% url 'account_signup' %}?next={{request.path}}">Sign up</a>
+                <a href="{% url 'account_signup' %}?next={{request.path}}" class="text-white">Sign up</a>
             </li>
             {% endif %}
         </ul>
@@ -119,6 +119,7 @@
                         <li><a href="{% url 'books' %}?del=y">Books in ashcan</a></li>
                         <li><a href="{% url 'authors' %}?del=y">Author in ashcan</a></li>
                         {% endif%}
+                        <br><br>
                     </ul>
                 </div>
                 {% endblock %}
