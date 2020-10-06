@@ -66,21 +66,11 @@
             {% endif %}
         </div>
         <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
-            {% if perms.catalog.can_mark_returned %}
-            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a>
-                    Librarian
-                </a>
-            </li>
-            {% endif %}
             {% if user.is_authenticated %}
             <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a>
-                    {{ user.get_username }}
+                <a href="{% url 'user-detail' user.id %}?next={{request.path}}" class="text-white">{{ user.get_username }}
+                    {% if perms.catalog.can_mark_returned %} (Librarian){% endif %}
                 </a>
-            </li>
-            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a href="{% url 'user-detail' user.id %}?next={{request.path}}" class="text-white">My Account</a>
             </li>
             <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
                 <a href="{% url 'account_logout'%}?next={{request.path}}" class="text-white" s>Logout</a>
