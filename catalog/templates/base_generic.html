@@ -47,7 +47,20 @@
                         <a class="dropdown-item" href="{% url 'all-borrowed' %}">Book renew</a>
                     </div>
                 </li>
-                {% endif %}
+                {% endif %}                
+            </ul>
+            {% if messages %}
+            <ul class="navbar-nav mr-auto">
+                {% for message in messages %}
+                    <li class="nav-item">
+                        <a class="nav-link disabled text-primary" href="#" aria-disabled="true">
+                            &raquo; &raquo; &nbsp; {{ message }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <ul class="navbar-nav d-md-flex">
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown ">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
@@ -80,7 +93,7 @@
     </nav>
 
 
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-sm-12 ">
                 {% block content %} default content {% endblock %}
