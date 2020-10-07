@@ -16,7 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-import logging
+from django.db.models import Q
 from django.contrib import messages
 
 
@@ -100,14 +100,20 @@ class AuthorListView(generic.ListView):
     paginate_by = settings.PAGE_SIZE
 
     def get_queryset(self):
+        search = self.request.GET.get('q')
+        queryset=Author.objects.all()
+        if search:
+            queryset=queryset.filter(Q(first_name__icontains=search)|Q(last_name__icontains=search))
         if self.request.GET.get('del') is not None:
-            return Author.objects.filter(deleted_at__isnull=False)
-        return Author.objects.filter(deleted_at__isnull=True)
+            return queryset.filter(deleted_at__isnull=False)
+        return queryset.filter(deleted_at__isnull=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('del') is not None:
             context['admin']='Yes'
+        if self.request.GET.get('q'):
+            context['q']=self.request.GET.get('q')
         return context
         
 
@@ -130,7 +136,18 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     paginate_by = settings.PAGE_SIZE
 
     def get_queryset(self):
-        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+        search = self.request.GET.get('q')
+        if search:
+            books = Book.objects.filter(title__icontains=search)
+            return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').filter(Q(book__in=books)|Q(imprint__icontains=search)).order_by('due_back')
+        else:
+            return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('q'):
+            context['q']=self.request.GET.get('q')
+        return context
 
 
 class LoanedBooksListView(PermissionRequiredMixin, generic.ListView):
@@ -143,10 +160,17 @@ class LoanedBooksListView(PermissionRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['all'] = True
+        if self.request.GET.get('q'):
+            context['q']=self.request.GET.get('q')
         return context
 
     def get_queryset(self):
-        return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+        search = self.request.GET.get('q')
+        if search:
+            books = Book.objects.filter(title__icontains=search)
+            return BookInstance.objects.filter(status__exact='o').filter(Q(book__in=books)|Q(imprint__icontains=search)).order_by('due_back')
+        else:
+            return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
 @permission_required('catalog.can_renew')
@@ -348,10 +372,23 @@ class BookInstanceListView(PermissionRequiredMixin, generic.ListView):
     permission_required = 'catalog.can_mark_returned'
 
     def get_queryset(self):
-        if self.request.GET.get('del') is not None:
-            return BookInstance.objects.filter(deleted_at__isnull=False)
-        return BookInstance.objects.all()
+        search = self.request.GET.get('q')
+        if search:
+            books = Book.objects.filter(title__icontains=search)
+            if self.request.GET.get('del') is not None:
+                return BookInstance.objects.filter(deleted_at__isnull=False).filter(Q(book__in=books)|Q(imprint__icontains=search))
+            return BookInstance.objects.all().filter(Q(book__in=books)|Q(imprint__icontains=search))
+        else:
+            if self.request.GET.get('del') is not None:
+                return BookInstance.objects.filter(deleted_at__isnull=False)
+            return BookInstance.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('q'):
+            context['q']=self.request.GET.get('q')
+        return context
+        
 
 class BookInstanceCreate(PermissionRequiredMixin, CreateView):
     model = BookInstance

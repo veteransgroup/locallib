@@ -50,7 +50,6 @@ To get this project up and running locally on your computer:
 
 
 ## Todo functions:
-### add search and filter
 ### add new models to impl loaning history functions
 ### add like and dislike function
 ### add member can comment book
