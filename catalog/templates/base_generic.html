@@ -17,104 +17,72 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" href="{% url 'index' %}">Public Library</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04"
+            aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <style>
-        .nav {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            width: 11%;
-            background-color: #f1f1f1;
-            height: 100%;
-            /* Full height */
-            position: fixed;
-            /* Make it stick, even on scroll */
-            overflow: auto;
-            /* Enable scrolling if the sidenav has too much content */
-        }
-
-        li a {
-            display: block;
-            color: #000;
-            padding: 4px 20px;
-            text-decoration: none;
-        }
-
-        li a:hover {
-            width: 100%;
-            background-color: rgb(192, 192, 192);
-            color: rgb(255, 255, 255);
-        }
-
-        .active {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-        }
-    </style>
-    <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar sticky-top bg-secondary">
-        <a href="{% url 'index' %}" class="navbar-brand mr-0 mr-md-2 text-white">City Public Library</a>
-        <div class="navbar-nav-scroll">
-            {% if messages %}
-            <div>
-                <ul>
-                    {% for message in messages %}
-                    &raquo; &raquo; &nbsp; &nbsp;<ins class="text-danger">{{message}}</ins>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
+        <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'books' %}">Books <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'authors' %}">Authors</a>
+                </li>
+                {% if perms.catalog.can_mark_returned %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Manage</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown04">
+                        <a class="dropdown-item" href="{% url 'book_create' %}">Add book</a>
+                        <a class="dropdown-item" href="{% url 'author_create' %}">Add author</a>
+                        <hr>
+                        <a class="dropdown-item" href="{% url 'books' %}?del=y">Book in ashcan</a>
+                        <a class="dropdown-item" href="{% url 'authors' %}?del=y">Book in ashcan</a>
+                        <hr>
+                        <a class="dropdown-item" href="{% url 'bookinstances' %}">Book instances</a>
+                        <a class="dropdown-item" href="{% url 'all-borrowed' %}">Book renew</a>
+                    </div>
+                </li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown ">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown04">
+                        <a class="dropdown-item" href="{% url 'my-borrowed' %}">My Borrowed</a>
+                        <a class="dropdown-item" href="{% url 'user-detail' user.id %}?next={{request.path}}">My
+                            Account</a>
+                    </div>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="{% url 'account_logout'%}?next={{request.path}}" tabindex="-1"
+                        aria-disabled="true">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'account_login'%}?next={{request.path}}" tabindex="-1"
+                        aria-disabled="true">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'account_signup' %}?next={{request.path}}" tabindex="-1"
+                        aria-disabled="true">Sing up</a>
+                </li>
+                {% endif %}
+            </ul>
+            <form class="form-inline my-2 my-md-0">
+                <input class="form-control" type="text" placeholder="Search">
+            </form>
         </div>
-        <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
-            {% if user.is_authenticated %}
-            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a href="{% url 'user-detail' user.id %}?next={{request.path}}" class="text-white">{{ user.get_username }}
-                    {% if perms.catalog.can_mark_returned %} (Librarian){% endif %}
-                </a>
-            </li>
-            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a href="{% url 'account_logout'%}?next={{request.path}}" class="text-white" s>Logout</a>
-            </li>
-            {% else %}
-            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a href="{% url 'account_login'%}?next={{request.path}}" class="text-white">Login</a>
-            </li>
-            <li class="btn btn-bd-download d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3">
-                <a href="{% url 'account_signup' %}?next={{request.path}}" class="text-white">Sign up</a>
-            </li>
-            {% endif %}
-        </ul>
-    </header>
+    </nav>
+
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-2">
-                {% block sidebar %}
-                <div class="nav">
-                    <ul class="sidebar-nav">
-                        <li><a href="{% url 'books' %}">All books</a></li>
-                        <li><a href="{% url 'authors' %}">All authors</a></li>
-                        <br>
-                        {% if user.is_authenticated %}
-                        <li><a href="{% url 'my-borrowed' %}">My borrowed</a></li>
-                        {% endif %}
-                        <br>
-                        {% if perms.catalog.can_mark_returned %}
-                        <li><a href="{% url 'all-borrowed' %}">All borrowed</a></li>
-                        <li><a href="{% url 'bookinstances' %}">All book instances</a></li>
-                        <br>
-                        <li><a href="{% url 'book_create' %}">Add book</a></li>
-                        <li><a href="{% url 'author_create' %}">Add author</a></li>
-                        <br>
-                        <li><a href="{% url 'books' %}?del=y">Books in ashcan</a></li>
-                        <li><a href="{% url 'authors' %}?del=y">Author in ashcan</a></li>
-                        {% endif%}
-                        <br><br>
-                    </ul>
-                </div>
-                {% endblock %}
-            </div>
-            <div class="col-sm-10 ">
+            <div class="col-sm-12 ">
                 {% block content %} default content {% endblock %}
                 {% block pagination %}
                 {% if is_paginated %}
