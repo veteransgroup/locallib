@@ -54,7 +54,7 @@ class Book(BaseModel):
     """
     Model representing a book (but not a specific copy of a book).
     """
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, verbose_name="Book Name")
     author = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
     # Foreign Key used because book can only have one author, but authors can have multiple books
     # Author as a string rather than object because it hasn't been declared yet in the file.

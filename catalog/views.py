@@ -65,14 +65,20 @@ class BookListView(generic.ListView):
     # 覆写 get_queryset 可自定义查询结果
 
     def get_queryset(self):
+        search = self.request.GET.get('q')
+        queryset=Book.objects.all()
+        if search:
+            queryset=queryset.filter(title__icontains=search)
         if self.request.GET.get('del') is not None:
-            return Book.objects.filter(deleted_at__isnull=False)
-        return Book.objects.filter(deleted_at=None)
+            return queryset.filter(deleted_at__isnull=False)
+        return queryset.filter(deleted_at=None)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.GET.get('del') is not None:
+        if self.request.GET.get('del'):
             context['admin']='Yes'
+        if self.request.GET.get('q'):
+            context['q']=self.request.GET.get('q')
         return context
 
 
