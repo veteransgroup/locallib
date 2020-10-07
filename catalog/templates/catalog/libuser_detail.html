@@ -10,7 +10,10 @@
 <p><strong>Card No:</strong> {{ user.card_No }}</p>
 <p><strong>Phone:</strong> {{ user.phone }}</p>
 <hr>
-<p><a href="{% url 'user_update' user.id %}">Change info</a></p>
+<p>
+    <a href="{% url 'user_update' user.id %}">Change info</a> &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="{% url 'account_change_password' %}">Change password</a>
+</p>
 <hr>
 <p>You can use your username, email or card_no login this system!</p>
 <hr>
