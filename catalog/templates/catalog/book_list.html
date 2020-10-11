@@ -2,25 +2,8 @@
 
 {% block content %}
 
-<!-- <div class="row">
-  <div class="col-md-4"> -->
-    <h1>{% if admin %}Deleted {% endif %}Book List</h1>
-  <!-- </div>
-  div class="col-md-8">
-    <form class="navbar navbar-expand navbar-dark flex-column" action="" method="get">
-      <div class="row">
-        <div class="col-md-8">
-          <input type="text" size="40" name="q" value="{{q}}" autofocus>
-          {% if admin %}
-          <input type="hidden" name="del" value="y">
-          {% endif %}
-        </div>
-        <div class="col-md-3">
-          <input type="submit" value="Search">
-        </div>
-    </form>
-  </div>
-</div> -->
+<h1>{% if admin %}Deleted {% endif %}Book List</h1>
+
 {% if book_list %}
 <ul>
   <table class="table table-hover">
