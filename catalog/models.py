@@ -78,6 +78,11 @@ class Book(BaseModel):
     )
     language = models.CharField(max_length=2, choices=LANGUAGES,
                                 default='en', help_text="Enter the language of the book")
+    visited = models.PositiveIntegerField(default=1, editable=False)
+
+    def visit(self):
+        self.visited += 1
+        super().save(update_fields=['visited'])
 
     def __str__(self):
         """

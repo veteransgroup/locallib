@@ -1,3 +1,4 @@
+from django.http import response
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -18,7 +19,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
-
+from pure_pagination.mixins import PaginationMixin
 
 @csrf_exempt
 def hello(request):
@@ -54,7 +55,7 @@ def index(request):
     )
 
 
-class BookListView(generic.ListView):
+class BookListView(PaginationMixin, generic.ListView):
     # 继承 LoginRequiredMixin 则表示本视图必须登录才能访问
     # ListView 默认模板为 <模型名>_list.html；可用 template_name 属性指定别的模板
     # html模板中可使用 object_list 或 <模型名>_list 模板变量引用查询结果
@@ -88,6 +89,11 @@ class BookDetailView(generic.DetailView):
     # DetailView 里最少只需要提供 model 属性指明模型类即可
     model = Book
 
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        self.object.visit()
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['bookinstance_set'] = BookInstance.objects.filter(
@@ -95,7 +101,7 @@ class BookDetailView(generic.DetailView):
         return context
 
 
-class AuthorListView(generic.ListView):
+class AuthorListView(PaginationMixin, generic.ListView):
     model = Author
     paginate_by = settings.PAGE_SIZE
 
@@ -127,7 +133,7 @@ class AuthorDetailView(generic.DetailView):
         return context
 
 
-class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+class LoanedBooksByUserListView(LoginRequiredMixin, PaginationMixin, generic.ListView):
     """
     Generic class-based view listing books on loan to current user. 
     """
@@ -150,7 +156,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class LoanedBooksListView(PermissionRequiredMixin, generic.ListView):
+class LoanedBooksListView(PermissionRequiredMixin, PaginationMixin, generic.ListView):
     model = BookInstance
     paginate_by = settings.PAGE_SIZE
     permission_required = 'catalog.can_mark_returned'
@@ -366,7 +372,7 @@ def common_restore(request, pk):
     return redirect(redirect_to)
 
 
-class BookInstanceListView(PermissionRequiredMixin, generic.ListView):
+class BookInstanceListView(PermissionRequiredMixin, PaginationMixin, generic.ListView):
     model = BookInstance
     paginate_by = settings.PAGE_SIZE
     permission_required = 'catalog.can_mark_returned'

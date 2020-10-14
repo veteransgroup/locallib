@@ -26,22 +26,9 @@
                 {% block content %} default content {% endblock %}
                 {% block pagination %}
                 {% if is_paginated %}
-                <div class="pagination">
-                    <span class="page-links">
-                        {% if page_obj.has_previous %}
-                        <a href="?page=1&q={{q}}">&laquo; first</a>
-                        <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}&q={{q}}">previous</a>
-                        {% endif %}
-                        <span class="page-current">
-                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}. Total:
-                            {{ page_obj.paginator.count }}
-                        </span>
-                        {% if page_obj.has_next %}
-                        <a href="{{ request.path }}?page={{ page_obj.next_page_number }}&q={{q}}">next</a>
-                        <a href="?page={{ page_obj.paginator.num_pages }}&q={{q}}">last &raquo;</a>
-                        {% endif %}
-                    </span>
-                </div>
+
+                    {{ page_obj.render }}
+
                 {% endif %}
                 {% endblock %}
             </div>

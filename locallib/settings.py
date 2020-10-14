@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
+    'pure_pagination',
 ]
 
 SITE_ID = 1
@@ -207,7 +208,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGIN_REDIRECT_URL = '/'
 
 PAGE_SIZE = 10
-
+PAGINATION_SETTINGS = {
+    "PAGE_RANGE_DISPLAYED": 4,
+    "MARGIN_PAGES_DISPLAYED": 2,
+    "SHOW_FIRST_PAGE_WHEN_INVALID": True,
+}
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'xxx@gmail.com'
