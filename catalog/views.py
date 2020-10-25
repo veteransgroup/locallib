@@ -235,7 +235,7 @@ class AuthorCreate(LoginRequiredMixin, CreateView):
     # CreateView 里最少只需要提供 model 和 fields 两个属性即可，且无需自己建 Form 类
     model = Author
     fields = ('first_name', 'last_name', 'date_of_birth', 'date_of_death')
-    # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性
+    # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性; Django REST Framework 在序列化器里面支持 exclude 
 
     # initial 属性可以在新建记录时设置字段的默认值
     # initial = {'date_of_death': '05/01/2089', }
