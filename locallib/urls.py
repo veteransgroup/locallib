@@ -27,13 +27,19 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     # path('accounts/', include('django.contrib.auth.urls')),
     path('catalog/', include('catalog.urls')),
+    path('help/', views.intro, name='introduction'),
     path('', RedirectView.as_view(url='/catalog/', permanent=True)),
     path('accounts/<int:pk>', views.UserDetailView.as_view(), name='user-detail'),
-    path('accounts/<int:pk>/update/', views.UserUpdateView.as_view(), name='user_update'),
+    path('accounts/<int:pk>/update/',
+         views.UserUpdateView.as_view(), name='user_update'),
 ]
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:    
-    urlpatterns += [url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT})]
-    urlpatterns += [url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})]
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns += [url(r'^static/(?P<path>.*)$', serve,
+                        {'document_root': settings.STATIC_ROOT})]
+    urlpatterns += [url(r'^uploads/(?P<path>.*)$', serve,
+                        {'document_root': settings.MEDIA_ROOT})]

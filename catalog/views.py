@@ -21,6 +21,7 @@ from django.db.models import Q
 from django.contrib import messages
 from pure_pagination.mixins import PaginationMixin
 
+
 @csrf_exempt
 def hello(request):
     result = {
@@ -29,6 +30,12 @@ def hello(request):
         'data': [],
     }
     return JsonResponse(result)
+
+
+def intro(request):
+    if request.method == 'POST':
+        raise response.Http404
+    return render(request, 'introduction.html')
 
 
 def index(request):
@@ -67,9 +74,9 @@ class BookListView(PaginationMixin, generic.ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('q')
-        queryset=Book.objects.all()
+        queryset = Book.objects.all()
         if search:
-            queryset=queryset.filter(title__icontains=search)
+            queryset = queryset.filter(title__icontains=search)
         if self.request.GET.get('del') is not None:
             return queryset.filter(deleted_at__isnull=False)
         return queryset.filter(deleted_at=None)
@@ -77,9 +84,9 @@ class BookListView(PaginationMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('del'):
-            context['admin']='Yes'
+            context['admin'] = 'Yes'
         if self.request.GET.get('q'):
-            context['q']=self.request.GET.get('q')
+            context['q'] = self.request.GET.get('q')
         return context
 
 
@@ -107,9 +114,10 @@ class AuthorListView(PaginationMixin, generic.ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('q')
-        queryset=Author.objects.all()
+        queryset = Author.objects.all()
         if search:
-            queryset=queryset.filter(Q(first_name__icontains=search)|Q(last_name__icontains=search))
+            queryset = queryset.filter(
+                Q(first_name__icontains=search) | Q(last_name__icontains=search))
         if self.request.GET.get('del') is not None:
             return queryset.filter(deleted_at__isnull=False)
         return queryset.filter(deleted_at__isnull=True)
@@ -117,11 +125,11 @@ class AuthorListView(PaginationMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('del') is not None:
-            context['admin']='Yes'
+            context['admin'] = 'Yes'
         if self.request.GET.get('q'):
-            context['q']=self.request.GET.get('q')
+            context['q'] = self.request.GET.get('q')
         return context
-        
+
 
 class AuthorDetailView(generic.DetailView):
     model = Author
@@ -145,14 +153,14 @@ class LoanedBooksByUserListView(LoginRequiredMixin, PaginationMixin, generic.Lis
         search = self.request.GET.get('q')
         if search:
             books = Book.objects.filter(title__icontains=search)
-            return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').filter(Q(book__in=books)|Q(imprint__icontains=search)).order_by('due_back')
+            return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').filter(Q(book__in=books) | Q(imprint__icontains=search)).order_by('due_back')
         else:
             return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('q'):
-            context['q']=self.request.GET.get('q')
+            context['q'] = self.request.GET.get('q')
         return context
 
 
@@ -167,14 +175,14 @@ class LoanedBooksListView(PermissionRequiredMixin, PaginationMixin, generic.List
         context = super().get_context_data(**kwargs)
         context['all'] = True
         if self.request.GET.get('q'):
-            context['q']=self.request.GET.get('q')
+            context['q'] = self.request.GET.get('q')
         return context
 
     def get_queryset(self):
         search = self.request.GET.get('q')
         if search:
             books = Book.objects.filter(title__icontains=search)
-            return BookInstance.objects.filter(status__exact='o').filter(Q(book__in=books)|Q(imprint__icontains=search)).order_by('due_back')
+            return BookInstance.objects.filter(status__exact='o').filter(Q(book__in=books) | Q(imprint__icontains=search)).order_by('due_back')
         else:
             return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
@@ -194,7 +202,8 @@ def renew_book_librarian(request, pk):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             book_inst.due_back = form.cleaned_data['renewal_date']
             book_inst.save()
-            messages.add_message(request, messages.INFO, "The book has renewed to %s" % form.cleaned_data['renewal_date'])
+            messages.add_message(
+                request, messages.INFO, "The book has renewed to %s" % form.cleaned_data['renewal_date'])
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('all-borrowed'))
 
@@ -211,7 +220,8 @@ def lend_book(request, pk):
     book_inst = get_object_or_404(BookInstance, pk=pk)
     user = get_object_or_404(LibUser, username=request.user)
     if user.email is None or user.email == '':
-        messages.add_message(request, messages.INFO, 'You can lend book instance after you register your email.')
+        messages.add_message(
+            request, messages.INFO, 'You can lend book instance after you register your email.')
         return HttpResponseRedirect(reverse('user-detail', kwargs={'pk': user.id}))
     if request.method == 'POST':
         form = RenewBookForm(request.POST)
@@ -220,7 +230,8 @@ def lend_book(request, pk):
             book_inst.borrower = request.user
             book_inst.status = 'o'
             book_inst.save()
-            messages.add_message(request, messages.INFO, "You have lended book: %s" % book_inst.book.title)
+            messages.add_message(
+                request, messages.INFO, "You have lended book: %s" % book_inst.book.title)
             return HttpResponseRedirect(reverse('my-borrowed'))
     else:
         proposed_return_date = datetime.date.today() + datetime.timedelta(weeks=3)
@@ -235,7 +246,7 @@ class AuthorCreate(LoginRequiredMixin, CreateView):
     # CreateView 里最少只需要提供 model 和 fields 两个属性即可，且无需自己建 Form 类
     model = Author
     fields = ('first_name', 'last_name', 'date_of_birth', 'date_of_death')
-    # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性; Django REST Framework 在序列化器里面支持 exclude 
+    # exclude = ['deleted_at'] # CreateView 不支持 exclude 属性; Django REST Framework 在序列化器里面支持 exclude
 
     # initial 属性可以在新建记录时设置字段的默认值
     # initial = {'date_of_death': '05/01/2089', }
@@ -244,7 +255,8 @@ class AuthorCreate(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         book_pk = self.request.GET.get('book')
-        messages.add_message(self.request, messages.SUCCESS, "Added author: %s" % self.object)
+        messages.add_message(self.request, messages.SUCCESS,
+                             "Added author: %s" % self.object)
         if book_pk is not None:
             book = get_object_or_404(Book, pk=book_pk)
             book.author = self.object     # self.object 为当前对象
@@ -288,7 +300,8 @@ class BookCreate(LoginRequiredMixin, CreateView):
 
     # 覆写 get_success_url 修改成功后跳转的地址，从哪里来回哪里去
     def get_success_url(self):
-        messages.add_message(self.request, messages.SUCCESS, "Added book: %s" % self.object)
+        messages.add_message(self.request, messages.SUCCESS,
+                             "Added book: %s" % self.object)
         if self.request.GET.get('author'):
             return reverse('author-detail', kwargs={'pk': self.request.GET.get('author')})
         return reverse('book-detail', kwargs={'pk': self.object.pk})
@@ -332,7 +345,8 @@ def common_delete(request, pk):
         book_id = request.GET.get('book')
         if obj.status == 'o':
             book = get_object_or_404(Book, pk=book_id)
-            messages.add_message(request, messages.WARNING, "Can't delete this book instance due to its on loan status")
+            messages.add_message(
+                request, messages.WARNING, "Can't delete this book instance due to its on loan status")
             return render(request, 'catalog/book_detail.html', {'book': book, 'object': book,
                                                                 'warn': "Can't delete this book instance due to its on loan status",
                                                                 'bookinstance_set': BookInstance.objects.filter(deleted_at=None).filter(book=book).order_by('-status')})
@@ -343,7 +357,8 @@ def common_delete(request, pk):
     if obj.deleted_at is None:
         obj.deleted_at = timezone.now()
         obj.save()
-        messages.add_message(request, messages.SUCCESS, "Success deleted: %s" % obj)
+        messages.add_message(request, messages.SUCCESS,
+                             "Success deleted: %s" % obj)
         return redirect(redirect_to)
     else:
         return redirect(redirect_to_del)
@@ -368,7 +383,8 @@ def common_restore(request, pk):
 
     obj.deleted_at = None
     obj.save()
-    messages.add_message(request, messages.SUCCESS, "Success restored: %s" % obj)
+    messages.add_message(request, messages.SUCCESS,
+                         "Success restored: %s" % obj)
     return redirect(redirect_to)
 
 
@@ -382,8 +398,8 @@ class BookInstanceListView(PermissionRequiredMixin, PaginationMixin, generic.Lis
         if search:
             books = Book.objects.filter(title__icontains=search)
             if self.request.GET.get('del') is not None:
-                return BookInstance.objects.filter(deleted_at__isnull=False).filter(Q(book__in=books)|Q(imprint__icontains=search))
-            return BookInstance.objects.all().filter(Q(book__in=books)|Q(imprint__icontains=search))
+                return BookInstance.objects.filter(deleted_at__isnull=False).filter(Q(book__in=books) | Q(imprint__icontains=search))
+            return BookInstance.objects.all().filter(Q(book__in=books) | Q(imprint__icontains=search))
         else:
             if self.request.GET.get('del') is not None:
                 return BookInstance.objects.filter(deleted_at__isnull=False)
@@ -392,9 +408,9 @@ class BookInstanceListView(PermissionRequiredMixin, PaginationMixin, generic.Lis
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.GET.get('q'):
-            context['q']=self.request.GET.get('q')
+            context['q'] = self.request.GET.get('q')
         return context
-        
+
 
 class BookInstanceCreate(PermissionRequiredMixin, CreateView):
     model = BookInstance
@@ -409,7 +425,8 @@ class BookInstanceCreate(PermissionRequiredMixin, CreateView):
         return initial_data
 
     def get_success_url(self):
-        messages.add_message(self.request, messages.SUCCESS, "Added book instance: %s" % self.object)
+        messages.add_message(self.request, messages.SUCCESS,
+                             "Added book instance: %s" % self.object)
         if self.request.GET.get('book'):
             return reverse('book-detail', kwargs={'pk': self.request.GET.get('book')})
         return reverse('bookinstances')
@@ -431,7 +448,8 @@ class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
         self.object = self.get_object()
         if self.object.status == 'o' and self.object.borrower is not None:
             # return HttpResponseRedirect(reverse('bookinstances'))
-            messages.add_message(request, messages.ERROR, "Can't delete this book instance due to its on loan by %s" % self.object.borrower)
+            messages.add_message(
+                request, messages.ERROR, "Can't delete this book instance due to its on loan by %s" % self.object.borrower)
             return render(request, 'catalog/bookinstance_list.html', {'object_list': BookInstance.objects.all(),
                                                                       'warn': "Can't delete this book instance due to its on loan by %s" % self.object.borrower})
         else:
